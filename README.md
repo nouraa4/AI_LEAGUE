@@ -68,7 +68,7 @@ FanIQ provides a smart and real-time solution that:
    - The dataset was labeled and exported from Roboflow in YOLO format  
 
 2. **Model Training**  
-   - YOLOv5 was trained on the dataset using a Kaggle notebook environment  
+   - YOLOv8m was trained on the dataset using a Kaggle notebook environment  
 
 3. **Real-time Visualization**  
    - The trained model predicts people count in images of stadium gates  
@@ -83,6 +83,9 @@ FanIQ provides a smart and real-time solution that:
 
 Watch our project demo here:  
 **[FanIQ Demo Video - Google Drive](https://drive.google.com/file/d/1URNQ-5kOLMAH3fPv2eBFKq-BVOuZnXga)**
+
+Try it live:  
+**[FanIQ Streamlit Web App](https://ailuguge-pyyfczzgbn8yezazup2axq.streamlit.app)**
 
 ---
 
