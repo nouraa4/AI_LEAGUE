@@ -1,8 +1,7 @@
 streamlit
 streamlit-folium
 ultralytics
-opencv-python
-numpy
+opencv-python-headless==4.8.0.76numpy
 Pillow
 folium
 gdown
