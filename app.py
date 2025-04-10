@@ -1,12 +1,10 @@
 import streamlit as st
 import os
-import cv2
 import folium
 import gdown
 import numpy as np
 from ultralytics import YOLO
 from streamlit_folium import st_folium
-
 
 # رابط Google Drive لتحميل النموذج
 model_url = "https://drive.google.com/file/d/1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
@@ -34,17 +32,14 @@ gate_info = {}
 
 # تحليل صورة من كل بوابة
 for gate, info in gate_dirs.items():
-    folder = info["path"]
-    if not os.path.exists(folder):
-        st.warning(f"❌ لم يتم العثور على مجلد {folder}")
+    image_path = info["path"]
+
+    # تحقق من وجود الصورة
+    if not os.path.exists(image_path):
+        st.warning(f"❌ لم يتم العثور على الصورة في {image_path}")
         continue
 
-    files = os.listdir(folder)
-    if not files:
-        st.warning(f"❌ لا توجد صور في {folder}")
-        continue
-
-    image_path = os.path.join(folder, files[0])  # أول صورة فقط
+    # تطبيق نموذج YOLO على الصورة
     results = model(image_path)[0]
 
     # حساب عدد الأشخاص (class = 0)
