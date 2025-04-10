@@ -11,9 +11,11 @@ st.set_page_config(page_title="F.A.N.S | Crowd Management", page_icon="🎉", la
 
 # رأس الصفحة
 st.markdown("""
-    <h1 style='text-align: center; color: #2E86C1;'>📣 نظام إدارة الزحام - <span style='color:#117864'>F.A.N.S</span></h1>
-    <p style='text-align: center; font-size:18px;'>تحليل الزحام الحي في بوابات الملاعب باستخدام YOLOv8</p>
-    <hr style="border:1px solid #bbb">
+    <div style='padding: 20px 0; text-align: center;'>
+        <h1 style='color: #2E86C1;'>📣 نظام إدارة الزحام - <span style='color:#117864'>F.A.N.S</span></h1>
+        <p style='font-size:18px;'>نموذج ذكي لتحليل الزحام في أي منطقة داخل الفعاليات الجماهيرية</p>
+        <hr style="border:1px solid #bbb; margin-top: 20px;">
+    </div>
 """, unsafe_allow_html=True)
 
 # تحميل الموديل
@@ -36,7 +38,7 @@ gate_dirs = {
 
 gate_info = {}
 
-st.subheader("🔍 تحليل البوابات")
+st.subheader("🔍 تحليل الزحام عند البوابات")
 
 # تحليل الصور
 for gate, info in gate_dirs.items():
@@ -71,19 +73,21 @@ for gate, info in gate_dirs.items():
     except Exception as e:
         st.warning(f"❌ خطأ أثناء تحليل الصورة {image_path}: {e}")
 
-# عرض النتائج في بطاقات
-cols = st.columns(3)
+# عرض النتائج في بطاقات بتباعد أفضل
+st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
+cols = st.columns(len(gate_info))
 for i, (gate, data) in enumerate(gate_info.items()):
     with cols[i]:
         st.markdown(f"""
-            <div style="border:1px solid #ccc; border-radius:12px; padding:16px; background-color:#f9f9f9; text-align:center;">
+            <div style="border:1px solid #ccc; border-radius:16px; padding:20px; background-color:#f9f9f9; text-align:center; margin-bottom:20px; box-shadow:2px 2px 10px rgba(0,0,0,0.05);">
                 <h3 style="color:#2E86C1;">🅰️ بوابة {gate}</h3>
-                <p style="font-size:18px;">👥 <strong>{data['count']}</strong> شخص</p>
-                <p style="font-size:16px;">🚦 <span style="color:{data['color']};"><strong>{data['level']}</strong></span></p>
+                <p style="font-size:20px;">👥 <strong>{data['count']}</strong> شخص</p>
+                <p style="font-size:18px;">🚦 <span style="color:{data['color']};"><strong>{data['level']}</strong></span></p>
             </div>
         """, unsafe_allow_html=True)
 
 # الخريطة
+st.markdown("<div style='margin-top: 40px;'></div>", unsafe_allow_html=True)
 st.subheader("🗺️ الخريطة التفاعلية")
 
 map_center = [24.7838, 46.7270]
@@ -102,7 +106,9 @@ st_folium(m, width=700, height=450)
 if gate_info:
     recommended = min(gate_info.items(), key=lambda x: x[1]['count'])[0]
     st.markdown(f"""
-        <div style="background-color:#dff0d8; padding:15px; border-radius:10px; text-align:center;">
-            ✅ نوصي بالتوجه إلى <strong>بوابة {recommended}</strong> لكونها الأقل ازدحامًا.
+        <div style="background-color:#e8f5e9; padding:20px; border-radius:12px; text-align:center; margin-top:30px;">
+            🧭 <span style="font-size:18px;">نوصي بالتوجه إلى</span> 
+            <strong style="color:#117864; font-size:20px;">بوابة {recommended}</strong> 
+            <span style="font-size:18px;">لأنها الأقل ازدحامًا</span>
         </div>
     """, unsafe_allow_html=True)
