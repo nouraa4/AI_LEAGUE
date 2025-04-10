@@ -1,6 +1,6 @@
-opencv-python
 streamlit
 streamlit-folium
+opencv-python
 ultralytics
 numpy
 Pillow
