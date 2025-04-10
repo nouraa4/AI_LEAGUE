@@ -1,9 +1,8 @@
-pip install --no-cache-dir -r requirements.txt
 streamlit
-numpy==1.23.5
-opencv-python-headless==4.6.0.66
+numpy
+opencv-python-headless
 Pillow
 folium
 gdown
-pybind11>=2.12
+pybind11
 
