@@ -57,7 +57,7 @@ FanIQ provides a smart and real-time solution that:
 - **Type**: Crowd images with varying densities and annotated people  
 - **Source**: [Roboflow - Crowd Counting Dataset](https://universe.roboflow.com/crowd-dataset/crowd-counting-dataset-w3o7w)  
 - **Usage**:  
-  - Used to train a YOLOv5 model for person detection  
+  - Used to train a YOLOv8m model for person detection  
   - Person count is used to determine crowd density levels (low, medium, high)  
 
 ---
