@@ -45,7 +45,7 @@ FanIQ provides a smart and real-time solution that:
 
 - Python  
 - Streamlit  
-- YOLOv5 (for person detection)  
+- YOLOv8m (for person detection)  
 - Roboflow (for dataset and model training)  
 - Kaggle (for training environment)  
 
@@ -81,7 +81,7 @@ FanIQ provides a smart and real-time solution that:
 ## Demo
 
 Watch our project demo here:  
-**[FanIQ Demo Video - Google Drive](https://drive.google.com/file/d/1URNQ-5kOLMAH3fPv2eBFKq-BVOuZnXga/view?pli=1)**
+**[FanIQ Demo Video - Google Drive](https://drive.google.com/file/d/1URNQ-5kOLMAH3fPv2eBFKq-BVOuZnXga)**
 
 ---
 
