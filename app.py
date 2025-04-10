@@ -9,7 +9,7 @@ from streamlit_folium import st_folium
 
 # رابط Google Drive لتحميل النموذج
 model_url = "https://drive.google.com/file/d/1hwEvUS9SPAxvOXeKi3BIDL4ut7FetfEf"
-model_path = "best_Model.h5" 
+model_path = "best_Model" 
 
 # تحميل النموذج إذا ما كان موجود
 if not os.path.exists(model_path):
