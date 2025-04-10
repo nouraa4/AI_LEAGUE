@@ -1,6 +1,8 @@
 streamlit
 streamlit-folium
-tensorflow
-pillow
-folium
+ultralytics
+opencv-python
 numpy
+Pillow
+folium
+gdown
