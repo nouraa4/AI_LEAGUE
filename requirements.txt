@@ -1,9 +1,3 @@
 streamlit
-streamlit-folium
 numpy==1.24.4
 opencv-python-headless==4.7.0.72
-ultralytics==8.0.20
-Pillow
-folium
-gdown
-pybind11>=2.12
