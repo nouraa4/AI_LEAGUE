@@ -2,7 +2,6 @@ streamlit
 streamlit-folium
 ultralytics
 numpy
-opencv-python-headless
 Pillow
 folium
 gdown
