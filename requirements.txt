@@ -6,3 +6,4 @@ ultralytics==8.0.20
 Pillow
 folium
 gdown
+pybind11>=2.12
