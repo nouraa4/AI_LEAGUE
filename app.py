@@ -1,13 +1,15 @@
 import streamlit as st
 import os
+import cv2
 import folium
 import gdown
+import numpy as np
 from ultralytics import YOLO
 from streamlit_folium import st_folium
 
 # رابط Google Drive لتحميل النموذج
 model_url = "https://drive.google.com/file/d/1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
-model_path = "best_Model"
+model_path = "best_Model" 
 
 # تحميل النموذج إذا ما كان موجود
 if not os.path.exists(model_path):
@@ -31,35 +33,44 @@ gate_info = {}
 
 # تحليل صورة من كل بوابة
 for gate, info in gate_dirs.items():
-    image_path = info["path"]  # الباث المباشر للصورة
+    image_path = info["path"]
+    
+    # التحقق من وجود الصورة
     if not os.path.exists(image_path):
         st.warning(f"❌ لم يتم العثور على الصورة {image_path}")
         continue
 
-    # استخدام الصورة مباشرة مع YOLO
-    results = model(image_path)[0]
+    # اختبار إذا كانت الصورة موجودة، ثم تمريرها للنموذج
+    try:
+        # النتائج من النموذج
+        results = model(image_path)[0]
+        
+        # حساب عدد الأشخاص (class = 0)
+        person_count = sum(1 for c in results.boxes.cls if int(c) == 0)
 
-    # حساب عدد الأشخاص (class = 0)
-    person_count = sum(1 for c in results.boxes.cls if int(c) == 0)
+        # تحديد مستوى الزحام بناءً على عدد الأشخاص
+        if person_count <= 10:
+            level = "خفيف"
+            color = "green"
+        elif person_count <= 30:
+            level = "متوسط"
+            color = "orange"
+        else:
+            level = "عالي"
+            color = "red"
 
-    # مستوى الزحام
-    if person_count <= 10:
-        level = "خفيف"
-        color = "green"
-    elif person_count <= 30:
-        level = "متوسط"
-        color = "orange"
-    else:
-        level = "عالي"
-        color = "red"
+        # تخزين المعلومات المتعلقة بالبوابة
+        gate_info[gate] = {
+            "count": person_count,
+            "level": level,
+            "color": color,
+            "lat": info["lat"],
+            "lon": info["lon"]
+        }
 
-    gate_info[gate] = {
-        "count": person_count,
-        "level": level,
-        "color": color,
-        "lat": info["lat"],
-        "lon": info["lon"]
-    }
+    except Exception as e:
+        st.warning(f"❌ حدث خطأ أثناء تحليل الصورة {image_path}: {e}")
+        continue
 
 # عرض النتائج
 for gate, data in gate_info.items():
