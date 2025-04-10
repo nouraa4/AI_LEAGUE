@@ -1,3 +1,4 @@
+python-3.11.8
 streamlit
 numpy
 opencv-python-headless==4.6.0.66
@@ -5,4 +6,4 @@ Pillow
 folium
 gdown
 pybind11>=2.12
-python-3.11.8
+
