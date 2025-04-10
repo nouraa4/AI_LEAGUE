@@ -8,7 +8,7 @@ from ultralytics import YOLO
 from streamlit_folium import st_folium
 
 # رابط Google Drive لتحميل النموذج
-model_url = "https://drive.google.com/file/d/1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
+model_url = "https://drive.google.com/drive/folders/1C1-8XyUa26bTWUIEcf9jWgUOVQO75N_q"
 model_path = "best_Model" 
 
 # تحميل النموذج إذا ما كان موجود
