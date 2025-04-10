@@ -1,6 +1,6 @@
 streamlit
 streamlit-folium
-ultralytics
+ultralytics>=8.0.0
 numpy
 Pillow
 folium
