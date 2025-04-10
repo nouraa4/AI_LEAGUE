@@ -9,13 +9,34 @@ from streamlit_folium import st_folium
 
 # رابط Google Drive لتحميل النموذج
 model_url = "https://drive.google.com/file/d/1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
-model_path = "best_Model.pt/best_Model" 
-
+model_path = "best_Model.pt"  # المسار الذي سيتم تحميل النموذج فيه
 # تحميل النموذج إذا ما كان موجود
 if not os.path.exists(model_path):
     with st.spinner("📥 جاري تحميل نموذج YOLO..."):
+        # تحميل الملف من Google Drive
         gdown.download(model_url, model_path, quiet=False)
         st.success("✅ تم تحميل النموذج!")
+
+# تحقق من أن الملف صحيح (أن يكون .pt وليس مجلد)
+if os.path.isdir(model_path):
+    st.error(f"❌ خطأ: {model_path} هو مجلد، يجب أن يكون الملف نموذج .pt وليس مجلدًا.")
+else:
+    try:
+        # تحميل النموذج من المسار
+        model = YOLO(model_path)
+        st.success("✅ تم تحميل النموذج بنجاح!")
+
+        # اختبار النموذج على صورة (تأكد من وجود الصورة في المسار الصحيح)
+        image_path = "crowd_system/A/a.png"  # تأكد من وجود الصورة في المسار الصحيح
+        results = model(image_path)
+
+        # عرض النتائج
+        st.image(image_path, caption="الصورة المدخلة")
+        st.write(results.pandas().xywh)  # عرض النتائج
+    except Exception as e:
+        st.error(f"❌ حدث خطأ أثناء تحميل النموذج: {e}")
+
+
 
 # تحميل النموذج
 model = YOLO(model_path)
