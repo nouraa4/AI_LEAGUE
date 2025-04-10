@@ -1,7 +1,7 @@
+opencv-python
 streamlit
 streamlit-folium
 ultralytics
-opencv-python-headless==4.8.0.76
 numpy
 Pillow
 folium
