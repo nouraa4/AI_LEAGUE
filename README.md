@@ -23,9 +23,10 @@
 
 ---
 
+
 ## Problem Statement
 
-In large-scale events like football matches and concerts, crowd congestion at gates can lead to:
+In large-scale events like football matches and concerts, especially with Saudi Arabia hosting the FIFA World Cup 2030, crowd congestion at gates becomes a major challenge. It can lead to:
 - Delayed entry for attendees  
 - Higher risk of stampedes  
 - Difficulties in managing visitor flow  
