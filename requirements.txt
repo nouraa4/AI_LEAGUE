@@ -1,4 +1,4 @@
-python_version == "3.10"
+python_version==3.10
 streamlit
 numpy==1.23.5
 opencv-python-headless==4.6.0.66
