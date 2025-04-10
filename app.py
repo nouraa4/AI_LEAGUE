@@ -23,9 +23,9 @@ model = YOLO(model_path)
 
 # إعداد مسارات البوابات
 gate_dirs = {
-    "A": {"path": "crowd_system/A", "lat": 24.7840, "lon": 46.7265},
-    "B": {"path": "crowd_system/B", "lat": 24.7832, "lon": 46.7282},
-    "C": {"path": "crowd_system/C", "lat": 24.7825, "lon": 46.7270},
+    "A": {"path": "crowd_system/A/a.png", "lat": 24.7840, "lon": 46.7265},
+    "B": {"path": "crowd_system/B/b.png", "lat": 24.7832, "lon": 46.7282},
+    "C": {"path": "crowd_system/C/c.png", "lat": 24.7825, "lon": 46.7270},
 }
 
 st.title("تحليل الزحام عند بوابات الملاعب باستخدام YOLOv8")
