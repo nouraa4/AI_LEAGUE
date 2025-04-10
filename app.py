@@ -7,9 +7,8 @@ import numpy as np
 from ultralytics import YOLO
 from streamlit_folium import st_folium
 
-print(st.__version__)
 print(cv2.__version__)
-print(mp.__version__)
+print(np.__version__)
 
 # رابط Google Drive لتحميل النموذج
 model_url = "https://drive.google.com/file/d/1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
