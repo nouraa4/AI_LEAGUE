@@ -99,16 +99,37 @@ if user_type == "مشجع":
             st.error("❌ رقم تذكرة غير معروف")
             
 
-    st.subheader("📍 خريطة البوابات")
-    m = folium.Map(location=[24.7838, 46.7270], zoom_start=17)
-    for gate, data in gate_info.items():
-        folium.Marker(
-            location=[data["lat"], data["lon"]],
-            popup=f"بوابة {gate} - {data['level']}",
-            icon=folium.Icon(color="green" if data["level"] == "خفيف" else
-                             "orange" if data["level"] == "متوسط" else "red")
-        ).add_to(m)
-    st_folium(m, width=700, height=450)
+    
+# عنوان
+st.subheader("📍 خريطة البوابات")
+
+# بيانات البوابات حسب ملعب الجوهرة
+gate_info = {
+    "A1": {"lat": 21.5721, "lon": 39.2395, "level": "متوسط"},
+    "A2": {"lat": 21.5724, "lon": 39.2402, "level": "خفيف"},
+    "B1": {"lat": 21.5730, "lon": 39.2410, "level": "عالي"},
+    "B2": {"lat": 21.5733, "lon": 39.2418, "level": "خفيف"},
+    "C1": {"lat": 21.5740, "lon": 39.2425, "level": "متوسط"},
+    "C2": {"lat": 21.5743, "lon": 39.2431, "level": "عالي"},
+    "D1": {"lat": 21.5736, "lon": 39.2389, "level": "خفيف"},
+    "D2": {"lat": 21.5731, "lon": 39.2382, "level": "خفيف"},
+}
+
+# إنشاء الخريطة
+m = folium.Map(location=[21.5730, 39.2410], zoom_start=17)
+
+# إضافة العلامات حسب مستوى الازدحام
+for gate, data in gate_info.items():
+    folium.Marker(
+        location=[data["lat"], data["lon"]],
+        popup=f"بوابة {gate} - {data['level']}",
+        icon=folium.Icon(color="green" if data["level"] == "خفيف"
+                         else "orange" if data["level"] == "متوسط"
+                         else "red")
+    ).add_to(m)
+
+# عرض الخريطة في Streamlit
+st_folium(m, width=700, height=450)
 
 
 # منظم
