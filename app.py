@@ -97,6 +97,19 @@ if user_type == "مشجع":
                 st.warning("⚠️ لا توجد بوابات متاحة حاليًا في هذه الجهة. يُرجى التواصل مع منظم.")
         else:
             st.error("❌ رقم تذكرة غير معروف")
+            
+
+    st.subheader("📍 خريطة البوابات")
+    m = folium.Map(location=[24.7838, 46.7270], zoom_start=17)
+    for gate, data in gate_info.items():
+        folium.Marker(
+            location=[data["lat"], data["lon"]],
+            popup=f"بوابة {gate} - {data['level']}",
+            icon=folium.Icon(color="green" if data["level"] == "خفيف" else
+                             "orange" if data["level"] == "متوسط" else "red")
+        ).add_to(m)
+    st_folium(m, width=700, height=450)
+
 
 # منظم
 else:
