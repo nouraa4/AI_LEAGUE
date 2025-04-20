@@ -11,11 +11,18 @@ from PIL import Image
 # إعداد الواجهة
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
+# تنسيق جذاب مع دارك مود
 st.markdown("""
     <style>
-    body { background-color: #1c1c1c; color: #ffffff; }
-    h1, h2, h3, h4 { color: #ECECEC; }
-    .stButton>button { background-color: #444; color: white; border-radius: 8px; }
+    body { background-color: #1c1c1c; color: white; }
+    h1, h2, h3, h4 { color: #ECECEC; font-weight: bold; }
+    .stButton>button { background-color: #A8E6CF; color: black; border-radius: 8px; font-weight: bold; }
+    .block-container { padding-top: 2rem; }
+    .stTextInput>div>div>input {
+        background-color: #2c2c2c;
+        color: white;
+        border-radius: 8px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -29,7 +36,7 @@ if not os.path.exists(model_path):
 
 model = YOLO(model_path)
 
-# بيانات بوابات ملعب الجوهرة
+# بيانات بوابات ملعب الجوهرة بالحروف
 gate_dirs = {
     "A": {"path": "crowd_system/A/a.png", "lat": 21.6225, "lon": 39.1105, "zone": "شمال"},
     "B": {"path": "crowd_system/B/b.png", "lat": 21.6230, "lon": 39.1110, "zone": "شمال"},
@@ -39,7 +46,6 @@ gate_dirs = {
     "F": {"path": "crowd_system/F/f.png", "lat": 21.6250, "lon": 39.1130, "zone": "جنوب"},
 }
 
-# استنتاج الجهة من رقم التذكرة
 def get_zone_from_ticket(ticket_id):
     if ticket_id.upper().startswith("A") or ticket_id.upper().startswith("B"):
         return "شمال"
@@ -52,16 +58,15 @@ def get_zone_from_ticket(ticket_id):
     else:
         return None
 
-# تحديد مستوى الزحام
 def get_congestion_level(count):
     if count <= 10:
-        return "خفيف", "green"
+        return "خفيف", "#A8E6CF"
     elif count <= 30:
-        return "متوسط", "orange"
+        return "متوسط", "#FFD3B6"
     else:
-        return "عالي", "red"
+        return "عالي", "#FF8B94"
 
-# تحليل الصور
+# تحليل صور البوابات
 gate_info = {}
 for gate, info in gate_dirs.items():
     image_path = info["path"]
@@ -78,55 +83,51 @@ for gate, info in gate_dirs.items():
             "zone": info["zone"]
         }
 
-# واجهة المشجع
-st.title("⚽ F.A.N.S - نظام ذكي لإدارة الحشود")
-
-st.header("🎫 توصية حسب تذكرتك")
-ticket_id = st.text_input("أدخل رقم تذكرتك (مثال: A123)")
-if ticket_id:
-    zone = get_zone_from_ticket(ticket_id)
-    if zone:
-        st.info(f"📍 جهة مقعدك حسب التذكرة: {zone}")
-        zone_gates = {g: d for g, d in gate_info.items() if d["zone"] == zone}
-        if zone_gates:
-            recommended_gate = min(zone_gates.items(), key=lambda x: x[1]["count"])[0]
-            st.success(f"✅ نوصي بالتوجه إلى بوابة: {recommended_gate} ({gate_info[recommended_gate]['level']})")
-        else:
-            st.warning("⚠️ لا توجد بوابات متاحة حاليًا في هذه الجهة.")
-    else:
-        st.error("❌ رقم تذكرة غير معروف")
-
-# خريطة البوابات
-st.subheader("📍 خريطة البوابات")
-m = folium.Map(location=[21.6235, 39.1115], zoom_start=17)
-for gate, data in gate_info.items():
-    folium.Marker(
-        location=[data["lat"], data["lon"]],
-        popup=f"بوابة {gate} - {data['level']}",
-        icon=folium.Icon(color=data["color"])
-    ).add_to(m)
-
-st_folium(m, width=700, height=450)
-
-
 # اختيار نوع المستخدم
 user_type = st.sidebar.selectbox("أنا:", ["مشجع", "منظم"])
 
-if user_type == "منظم":
-    st.header("📊 لوحة تحكم المنظم")
+# ----------------------------
+# واجهة المشجع
+# ----------------------------
+if user_type == "مشجع":
+    st.title("F.A.N.S - ملعب ذكي يشتغل معك")
+    st.markdown("**حلّ ذكي يسهّل دخولك ويوجهك لأفضل بوابة بحسب الزحام وموقعك!**")
 
-    # الخريطة
-    st.subheader("📍 خريطة البوابات")
-    m_admin = folium.Map(location=[21.6235, 39.1115], zoom_start=17)
+    st.header("🎫 توصية حسب تذكرتك")
+    ticket_id = st.text_input("أدخل رقم تذكرتك (مثال: A123)")
+
+    if ticket_id:
+        zone = get_zone_from_ticket(ticket_id)
+        if zone:
+            st.info(f"📍 جهة مقعدك حسب التذكرة: {zone}")
+            zone_gates = {g: d for g, d in gate_info.items() if d["zone"] == zone}
+            if zone_gates:
+                recommended_gate = min(zone_gates.items(), key=lambda x: x[1]["count"])[0]
+                st.success(f"✅ نوصي بالتوجه إلى بوابة: {recommended_gate} ({gate_info[recommended_gate]['level']})")
+            else:
+                st.warning("⚠️ لا توجد بوابات متاحة حالياً في هذه الجهة.")
+        else:
+            st.error("❌ رقم تذكرة غير معروف")
+
+    st.subheader("🗺️ خريطة الملاعب (بواباتك على الخريطة)")
+    m = folium.Map(location=[21.6235, 39.1115], zoom_start=17)
     for gate, data in gate_info.items():
         folium.Marker(
             location=[data["lat"], data["lon"]],
             popup=f"بوابة {gate} - {data['level']}",
-            icon=folium.Icon(color=data["color"])
-        ).add_to(m_admin)
-    st_folium(m_admin, width=700, height=450)
+            icon=folium.Icon(color="green" if data["level"] == "خفيف"
+                             else "orange" if data["level"] == "متوسط"
+                             else "red")
+        ).add_to(m)
+    st_folium(m, width=700, height=450)
 
-    # تفاصيل البوابات
+# ----------------------------
+# واجهة المنظم
+# ----------------------------
+else:
+    st.title("لوحة المنظم")
+    st.markdown("**مراقبة مباشرة لحالة البوابات وتنبيهات فورية.**")
+
     for gate, data in gate_info.items():
         st.markdown(f"""
         ### بوابة {gate}
@@ -134,20 +135,18 @@ if user_type == "منظم":
         - 🚦 مستوى الزحام: `{data['level']}`
         """)
 
-    # تنبيهات
-    st.subheader("🚨 تنبيهات")
+    st.subheader("🚨 تنبيهات الزحام العالي")
     for gate, data in gate_info.items():
         if data['level'] == "عالي":
             st.error(f"🔴 ازدحام عالي عند بوابة {gate}!")
 
-    # تحليل صورة خارجية
-    st.subheader("🛣️ تحليل صورة خارجية (زحام الشوارع أو المواقف)")
-    street_img = st.file_uploader("📷 حمّل صورة", type=["jpg", "png"])
+    st.subheader("📸 تحليل الشوارع أو المواقف")
+    street_img = st.file_uploader("ارفع صورة للمحيط الخارجي", type=["jpg", "png"])
     if street_img:
         img_array = np.array(Image.open(street_img))
         results = model(img_array)[0]
         person_count = sum(1 for c in results.boxes.cls if int(c) == 0)
-        vehicle_count = sum(1 for c in results.boxes.cls if int(c) in [2, 3, 5, 7])  # car, motorcycle, bus, truck
+        vehicle_count = sum(1 for c in results.boxes.cls if int(c) in [2, 3, 5, 7])
         total = person_count + vehicle_count
         level, _ = get_congestion_level(total)
         st.success(f"👥 أشخاص: {person_count} | 🚗 مركبات: {vehicle_count}")
