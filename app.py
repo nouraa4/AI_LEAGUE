@@ -125,7 +125,7 @@ if user_type == "مشجع":
 else:
     st.title("📊 لوحة تحكم المنظم")
 
-    st.subheader("📦 بيانات البوابات")
+    st.subheader(" بيانات البوابات")
     cols = st.columns(3)
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
