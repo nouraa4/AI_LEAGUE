@@ -1,41 +1,15 @@
 import streamlit as st
 
-# ====== إعدادات الصفحة ======
-st.set_page_config(page_title="F.A.N.S - Recommend Gate", layout="centered")
+# إعدادات الصفحة
+st.set_page_config(page_title="F.A.N.S", layout="wide")
 
-# ====== CSS ستايل فخم بنفس طابع الصورة ======
+# ============================= CSS ستايل فخم =============================
 st.markdown("""
     <style>
     html, body, [class*="css"]  {
         background-color: #121212;
         color: white;
         font-family: 'Segoe UI', sans-serif;
-    }
-
-    .title {
-        font-size: 42px;
-        font-weight: 800;
-        text-align: center;
-        color: #ffffff;
-        padding: 10px 0;
-    }
-
-    .subtitle {
-        font-size: 20px;
-        text-align: center;
-        color: #bbbbbb;
-        margin-bottom: 40px;
-    }
-
-    .gate-box {
-        background: linear-gradient(to right, #ff416c, #ff4b2b);
-        padding: 25px;
-        border-radius: 20px;
-        color: white;
-        font-size: 22px;
-        font-weight: bold;
-        text-align: center;
-        margin-top: 30px;
     }
 
     .stTextInput > div > div > input {
@@ -60,19 +34,61 @@ st.markdown("""
         background: linear-gradient(to right, #ff4b2b, #ff416c);
         cursor: pointer;
     }
+
+    .title {
+        font-size: 42px;
+        font-weight: 800;
+        text-align: center;
+        color: #ffffff;
+        padding: 10px 0;
+    }
+
+    .section {
+        padding: 20px;
+    }
+
+    .gate-box {
+        background: linear-gradient(to right, #ff416c, #ff4b2b);
+        padding: 25px;
+        border-radius: 20px;
+        color: white;
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 30px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# ====== المحتوى ======
-st.markdown('<div class="title">F.A.N.S</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">مرحبًا بك! احصل على توصية بأفضل بوابة لدخول الملعب</div>', unsafe_allow_html=True)
+# ============================= التنقل =============================
+page = st.sidebar.selectbox("اختر القسم", ["الصفحة الرئيسية", "توصية البوابة", "الخريطة", "لوحة المنظم"])
 
-ticket_number = st.text_input("أدخل رقم تذكرتك")
+# ============================= الصفحة الرئيسية =============================
+if page == "الصفحة الرئيسية":
+    st.markdown('<div class="title">F.A.N.S</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section">نظام ذكي لإدارة الحشود داخل الملاعب باستخدام الذكاء الاصطناعي. استمتع بتجربة مخصصة وسريعة في دخولك وخروجك من الملعب.</div>', unsafe_allow_html=True)
+    st.image("https://images.unsplash.com/photo-1596040033229-92c48b4d4215", use_column_width=True, caption="مرحبًا بك في F.A.N.S")
 
-if st.button("اقتراح البوابة"):
-    # لاحقًا: هنا تربطين مع الذكاء الاصطناعي أو قاعدة البيانات
-    recommended_gate = "B2"
-    st.markdown(
-        f'<div class="gate-box">✅ بوابتك الأنسب: <span style="font-size:28px;">{recommended_gate}</span></div>',
-        unsafe_allow_html=True
-    )
+# ============================= توصية البوابة =============================
+elif page == "توصية البوابة":
+    st.markdown('<div class="title">اقتراح البوابة</div>', unsafe_allow_html=True)
+    ticket_number = st.text_input("أدخل رقم تذكرتك:")
+    if st.button("احصل على التوصية"):
+        # لاحقًا: ربط مع الذكاء الاصطناعي أو قاعدة بيانات
+        st.markdown(
+            '<div class="gate-box">✅ بوابتك الأنسب: <span style="font-size:28px;">B2</span></div>',
+            unsafe_allow_html=True
+        )
+
+# ============================= الخريطة =============================
+elif page == "الخريطة":
+    st.markdown('<div class="title">خريطة الملعب</div>', unsafe_allow_html=True)
+    st.image("https://i.imgur.com/F3n44pD.png", caption="مخطط البوابات وأماكن الازدحام", use_column_width=True)
+
+# ============================= لوحة المنظم =============================
+elif page == "لوحة المنظم":
+    st.markdown('<div class="title">لوحة تحكم المنظم</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section">هنا ستظهر بيانات البوابات - عدد الداخلين - التحذيرات - حالة الزحام.</div>', unsafe_allow_html=True)
+    st.metric("عدد الحضور الكلي", "14,250")
+    st.metric("نسبة الزحام الحالية", "67%")
+    st.metric("أعلى بوابة ازدحامًا", "Gate A1")
