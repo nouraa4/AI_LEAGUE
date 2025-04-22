@@ -88,7 +88,7 @@ if "logged_users" not in st.session_state:
 
 # صفحة الترحيب
 if st.session_state.page == "welcome":
-    st.image("https://cdn.pixabay.com/photo/2017/08/06/00/24/stadium-2586128_1280.jpg", use_column_width=True)
+    st.image("welcome.png", use_column_width=True)
     st.markdown("<h1 class='hero'>أهلاً بك في منصة الملاعب الذكية F.A.N.S</h1>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
