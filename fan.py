@@ -1,3 +1,4 @@
+
 import streamlit as st
 import os
 import gdown
@@ -55,26 +56,24 @@ if st.session_state.page == "welcome":
             height: 100vh;
             overflow: hidden;
         }
-      .overlay {
-        background-color: rgba(0, 0, 0, 0.5);  /* خففنا الشفافية من 0.7 إلى 0.5 */
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: -1;
-    }
-    
-    .welcome-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        position: absolute;
-        top: 0;
-        left: 0;
-        border: 2px solid red;  /* مؤقتًا عشان تتأكدين إنها تظهر */
-        z-index: -2;
-    }
+        .welcome-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -2;
+        }
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
         .welcome-content {
             position: absolute;
             top: 50%;
@@ -108,6 +107,8 @@ if st.session_state.page == "welcome":
             <div class="overlay"></div>
             <div class="welcome-content">
                 <div class="welcome-title">🏟️ F.A.N.S - الملعب الذكي للمشجعين</div>
+            </div>
+        </div>
     """, unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
@@ -117,8 +118,6 @@ if st.session_state.page == "welcome":
     with col2:
         if st.button("أنا منظم"):
             st.session_state.page = "admin"
-
-    st.markdown("</div></div>", unsafe_allow_html=True)
 
 # Fan Page
 elif st.session_state.page == "fan":
@@ -172,9 +171,7 @@ elif st.session_state.page == "admin":
     cols = st.columns(3)
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
-            st.info("### بوابة {}\nعدد الأشخاص: {}\nمستوى الازدحام: {}\nالحالة: {}".format(
-                gate, data['count'], data['level'],
-                "مغلقة" if gate in st.session_state.closed_gates else "مفتوحة"))
+            st.info(f"بوابة {gate}\nعدد الأشخاص: {data['count']}\nمستوى الازدحام: {data['level']}\nالحالة: {'مغلقة' if gate in st.session_state.closed_gates else 'مفتوحة'}")
 
             if gate in st.session_state.closed_gates:
                 if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
