@@ -86,14 +86,13 @@ if "closed_gates" not in st.session_state:
 if "logged_users" not in st.session_state:
     st.session_state.logged_users = []
 
-# صفحة الترحيب
 if st.session_state.page == "welcome":
     st.markdown("""
         <style>
         .bg-container {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-image: 'welcome.png';
+            background-image: url('welcome.png');
             background-size: cover;
             background-position: center;
             z-index: -2;
@@ -102,45 +101,58 @@ if st.session_state.page == "welcome":
         .overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7); /* شفافية داكنة */
+            background-color: rgba(0, 0, 0, 0.75);
             z-index: -1;
         }
 
-        .centered {
+        .content {
+            position: relative;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             text-align: center;
         }
 
         .welcome-title {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: bold;
-            color: #FFFFFF;
-            margin-bottom: 2rem;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 2rem;
         }
 
         .stButton > button {
-            background-color: #00C896;
+            background-color: transparent;
             color: white;
+            border: 2px solid white;
             padding: 0.8rem 2rem;
-            margin: 0.5rem;
-            font-size: 1.1rem;
-            border: none;
+            font-size: 1.2rem;
             border-radius: 10px;
             font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .stButton > button:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid white;
         }
         </style>
 
         <div class="bg-container"></div>
         <div class="overlay"></div>
-        <div class="centered">
+        <div class="content">
             <div class="welcome-title">🏟️ F.A.N.S - الملعب الذكي للمشجعين</div>
-        """, unsafe_allow_html=True)
+            <div class="button-row">
+    """, unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 1])
     with col1:
         if st.button("أنا مشجع"):
             st.session_state.page = "fan"
@@ -148,7 +160,8 @@ if st.session_state.page == "welcome":
         if st.button("أنا منظم"):
             st.session_state.page = "admin"
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div></div>", unsafe_allow_html=True)
+    
     
 # صفحة المشجع
 elif st.session_state.page == "fan":
