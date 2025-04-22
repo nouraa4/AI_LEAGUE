@@ -79,54 +79,48 @@ for gate, info in gate_dirs.items():
         }
 
 # session state
-if "page" not in st.session_state:
-    st.session_state.page = "welcome"
-if "closed_gates" not in st.session_state:
-    st.session_state.closed_gates = []
-if "logged_users" not in st.session_state:
-    st.session_state.logged_users = []
-
 if st.session_state.page == "welcome":
-    st.markdown("""
+    st.markdown(f"""
         <style>
-        .bg-container {
+        .bg-container {{
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url("welcome.png");
+            background-image: url("data:image/jpeg;base64,{img_base64}");
             background-size: cover;
             background-position: center;
             z-index: -2;
-        }
+        }}
 
-        .overlay {
+        .overlay {{
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0, 0, 0, 0.75);
             z-index: -1;
-        }
+        }}
 
-        .content {
-            position: relative;
+        .content {{
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             text-align: center;
-        }
+        }}
 
-        .welcome-title {
+        .welcome-title {{
             font-size: 3rem;
             font-weight: bold;
             color: white;
-            margin-bottom: 1rem;
-        }
+            margin-bottom: 3rem;
+        }}
 
-        .button-row {
+        .button-row {{
             display: flex;
-        }
+            flex-direction: row;
+            gap: 2rem;
+        }}
 
-        .stButton > button {
+        .stButton > button {{
             background-color: transparent;
             color: white;
             border: 2px solid white;
@@ -135,13 +129,13 @@ if st.session_state.page == "welcome":
             border-radius: 10px;
             font-weight: bold;
             transition: 0.3s;
-        }
+        }}
 
-        .stButton > button:hover {
+        .stButton > button:hover {{
             background-color: white;
             color: black;
             border: 2px solid white;
-        }
+        }}
         </style>
 
         <div class="bg-container"></div>
@@ -160,7 +154,6 @@ if st.session_state.page == "welcome":
             st.session_state.page = "admin"
 
     st.markdown("</div></div>", unsafe_allow_html=True)
-    
     
 # صفحة المشجع
 elif st.session_state.page == "fan":
