@@ -93,7 +93,7 @@ if st.session_state.page == "welcome":
         .bg-container {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url('https://cdn.pixabay.com/photo/2017/08/06/00/24/stadium-2586128_1280.jpg');
+            background-image: 'welcome.png';
             background-size: cover;
             background-position: center;
             z-index: -2;
