@@ -55,24 +55,26 @@ if st.session_state.page == "welcome":
             height: 100vh;
             overflow: hidden;
         }
-        .welcome-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: -2;
-        }
-        .overlay {
-            background-color: rgba(0, 0, 0, 0.7);
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: -1;
-        }
+      .overlay {
+        background-color: rgba(0, 0, 0, 0.5);  /* خففنا الشفافية من 0.7 إلى 0.5 */
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+    }
+    
+    .welcome-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border: 2px solid red;  /* مؤقتًا عشان تتأكدين إنها تظهر */
+        z-index: -2;
+    }
         .welcome-content {
             position: absolute;
             top: 50%;
