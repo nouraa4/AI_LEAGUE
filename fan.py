@@ -108,11 +108,12 @@ elif user_type == "منظم":
     cols = st.columns(3)
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
-            st.markdown(f"""### بوابة {gate}
-- 👥 عدد الأشخاص: `{data['count']}`
-- 🚦 مستوى الزحام: `ازدحام {data['level']}`
-- 📌 الحالة: `{"مغلقة" if gate in closed_gates else "مفتوحة"}`""
-            )
+            st.markdown(f"""
+                ### بوابة {gate}
+                - 👥 عدد الأشخاص: `{data['count']}`
+                - 🚦 مستوى الزحام: `ازدحام {data['level']}`
+                - 📌 الحالة: `{"مغلقة" if gate in closed_gates else "مفتوحة"}`
+            """)
 
             if gate in closed_gates:
                 if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
