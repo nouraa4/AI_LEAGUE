@@ -16,8 +16,7 @@ st.markdown("""
     body { background-color: #1c1c1c; color: white; }
     h1, h2, h3, h4 { color: #ECECEC; font-weight: bold; }
     .stButton>button {
-        background-color: #A8E6CF;
-        color: black;
+        color: white;
         border-radius: 8px;
         font-weight: bold;
     }
@@ -32,9 +31,6 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
-# صورة ترحيبية
-st.image("https://drive.google.com/uc?id=1KFlOh1zlb7U3MU50O1dD0-eHRHQhFlkV", use_column_width=True)
 
 # تحميل النموذج
 model_path = "best_Model.pt"
