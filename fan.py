@@ -10,7 +10,7 @@ from PIL import Image
 
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
-# ⬛ ستايل دارك
+# تنسيق بصري
 st.markdown("""
     <style>
     body { background-color: #1c1c1c; color: white; }
@@ -24,7 +24,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# تحميل نموذج YOLO
+# تحميل النموذج
 model_path = "best_Model.pt"
 model_url = "https://drive.google.com/uc?id=1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
 if not os.path.exists(model_path):
@@ -34,7 +34,7 @@ if not os.path.exists(model_path):
 
 model = YOLO(model_path)
 
-# البوابات
+# بيانات البوابات
 gate_dirs = {
     "A": {"path": "crowd_system/A/a.png", "lat": 21.6225, "lon": 39.1105, "zone": "شمال"},
     "B": {"path": "crowd_system/B/b.png", "lat": 21.6230, "lon": 39.1110, "zone": "شمال"},
@@ -45,126 +45,126 @@ gate_dirs = {
     "G": {"path": "crowd_system/G/g.png", "lat": 21.6242, "lon": 39.1122, "zone": "غرب"},
 }
 
-# تحديد الجهة من التذكرة
-def get_zone_from_ticket(ticket_id):
-    if ticket_id.upper().startswith(("A", "B")): return "شمال"
-    elif ticket_id.upper().startswith("C"): return "شرق"
-    elif ticket_id.upper().startswith(("D", "G")): return "غرب"
-    elif ticket_id.upper().startswith(("E", "F")): return "جنوب"
-    return None
-
-# تحديد مستوى الازدحام
-def get_congestion_level(count):
-    if count <= 10: return "خفيف", "#A8E6CF"
-    elif count <= 30: return "متوسط", "#FFD3B6"
-    return "عالي", "#FF8B94"
-
-# ⛔️ إدارة إغلاق البوابات
-if "closed_gates" not in st.session_state:
-    st.session_state.closed_gates = set()
-
 # تحليل صور البوابات
 gate_info = {}
 for gate, info in gate_dirs.items():
     if os.path.exists(info["path"]):
         results = model(info["path"])[0]
         count = sum(1 for c in results.boxes.cls if int(c) == 0)
-        level, color = get_congestion_level(count)
+        level, color = (
+            ("خفيف", "#A8E6CF") if count <= 10 else
+            ("متوسط", "#FFD3B6") if count <= 30 else
+            ("عالي", "#FF8B94")
+        )
         gate_info[gate] = {
             "count": count,
             "level": level,
             "color": color,
             "lat": info["lat"],
             "lon": info["lon"],
-            "zone": info["zone"],
-            "is_closed": gate in st.session_state.closed_gates
+            "zone": info["zone"]
         }
 
-# 📍 واجهة ترحيب أولى
-st.title("🎉 أهلاً بك في F.A.N.S")
-st.markdown("نظام ذكي لتحليل الزحام وتوجيه الجماهير بشكل ذكي وآمن")
+# إدارة الحالة
+if "page" not in st.session_state:
+    st.session_state.page = "welcome"
+if "closed_gates" not in st.session_state:
+    st.session_state.closed_gates = []
 
-page = st.selectbox("اختر نوع الدخول:", ["- اختر -", "مشجع", "منظم"])
+# الصفحة الترحيبية
+if st.session_state.page == "welcome":
+    st.title("مرحبًا بك في نظام F.A.N.S")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("أنا مشجع"):
+            st.session_state.page = "fan"
+    with col2:
+        if st.button("أنا منظم"):
+            st.session_state.page = "admin"
 
 # واجهة المشجع
-if page == "مشجع":
-    st.header("🎫 صفحة المشجع")
-    user_name = st.text_input("اسمك:")
-    ticket_id = st.text_input("رقم تذكرتك:")
-    confirm = st.checkbox("✅ أؤكد دخولي للملعب")
+elif st.session_state.page == "fan":
+    st.title("🏟️ F.A.N.S - المشجع")
 
-    if user_name and ticket_id and confirm:
-        zone = get_zone_from_ticket(ticket_id)
-        if not zone:
-            st.error("❌ رقم تذكرة غير معروف")
-        else:
-            st.info(f"📍 جهة مقعدك حسب التذكرة: {zone}")
-            available_gates = {g: d for g, d in gate_info.items() if d["zone"] == zone and not d["is_closed"]}
-            filtered = {g: d for g, d in available_gates.items() if d["level"] != "عالي"}
+    # محاكاة بيانات التذكرة
+    user_ticket = "C123"  # يتم جلبه تلقائيًا من قاعدة البيانات
+    ticket_zone = gate_dirs[user_ticket[0]]["zone"]
+    st.info(f"🎫 تذكرتك مرتبطة بجهة: {ticket_zone}")
 
-            if filtered:
-                recommended = min(filtered.items(), key=lambda x: x[1]["count"])[0]
-                level_txt = f"ازدحام {filtered[recommended]['level']}"
-                st.success(f"✅ نوصي بالتوجه إلى بوابة: {recommended} ({level_txt})")
-            elif available_gates:
-                st.warning("⚠️ لا توجد بوابات خفيفة أو متوسطة، جميعها مزدحمة.")
-            else:
-                st.error("🚫 لا توجد بوابات متاحة في هذه الجهة حالياً (قد تكون مغلقة).")
+    available_gates = {g: d for g, d in gate_info.items()
+                       if d["zone"] == ticket_zone and g not in st.session_state.closed_gates}
 
-    # خريطة
+    low_congestion_gates = {g: d for g, d in available_gates.items()
+                            if d["level"] != "عالي"}
+
+    if not available_gates:
+        st.error("❌ جميع البوابات مغلقة في جهتك، تواصل مع منظم.")
+    elif not low_congestion_gates:
+        st.warning("⚠️ كل البوابات مزدحمة حالياً، يُنصح بالانتظار أو التواصل مع منظم.")
+    else:
+        recommended_gate = min(low_congestion_gates.items(), key=lambda x: x[1]["count"])[0]
+        level = gate_info[recommended_gate]["level"]
+        st.success(f"✅ أقرب بوابة مفضلة هي: {recommended_gate} (ازدحام {level})")
+
+    # الخريطة
     st.subheader("🗺️ خريطة الملاعب")
     m = folium.Map(location=[21.6235, 39.1115], zoom_start=17)
     for gate, data in gate_info.items():
-        icon_color = "gray" if data["is_closed"] else (
-            "green" if data["level"] == "خفيف" else "orange" if data["level"] == "متوسط" else "red")
         folium.Marker(
             location=[data["lat"], data["lon"]],
-            popup=f"بوابة {gate} - ازدحام {data['level']}" + (" (مغلقة)" if data["is_closed"] else ""),
-            icon=folium.Icon(color=icon_color)
+            popup=f"بوابة {gate} - ازدحام {data['level']}",
+            icon=folium.Icon(
+                color="gray" if gate in st.session_state.closed_gates else
+                "green" if data["level"] == "خفيف" else
+                "orange" if data["level"] == "متوسط" else
+                "red")
         ).add_to(m)
     st_folium(m, width=700, height=450)
 
 # واجهة المنظم
-elif page == "منظم":
-    st.header("📊 لوحة تحكم المنظم")
+elif st.session_state.page == "admin":
+    st.title("📊 لوحة تحكم المنظم")
 
     # إغلاق البوابات
-    st.subheader("🔐 إغلاق البوابات")
-    for gate in gate_dirs:
-        current_state = gate in st.session_state.closed_gates
-        new_state = st.checkbox(f"إغلاق بوابة {gate}", value=current_state)
-        if new_state:
-            st.session_state.closed_gates.add(gate)
+    st.subheader("🚪 إدارة البوابات")
+    for gate in gate_info.keys():
+        if st.checkbox(f"إغلاق بوابة {gate}", value=gate in st.session_state.closed_gates):
+            if gate not in st.session_state.closed_gates:
+                st.session_state.closed_gates.append(gate)
         else:
-            st.session_state.closed_gates.discard(gate)
+            if gate in st.session_state.closed_gates:
+                st.session_state.closed_gates.remove(gate)
 
-    # بيانات البوابات
-    st.subheader("📌 بيانات البوابات")
+    # عرض حالة البوابات
+    st.subheader("👁️‍🗨️ حالة البوابات")
     cols = st.columns(3)
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
             st.info(f"""### بوابة {gate}
 👥 عدد الأشخاص: {data['count']}
-🚦 مستوى الازدحام: ازدحام {data['level']}
-🔒 الحالة: {"مغلقة" if data['is_closed'] else "مفتوحة"}""")
+🚦 مستوى الازدحام: {data['level']}
+🔒 الحالة: {"مغلقة" if gate in st.session_state.closed_gates else "مفتوحة"}
+""")
 
-    # تنبيهات
-    st.subheader("🚨 تنبيهات")
+    # تنبيهات الزحمة
+    st.subheader("🚨 تنبيهات ازدحام")
     for gate, data in gate_info.items():
-        if data['level'] == "عالي":
-            st.error(f"🔴 ازدحام عالي عند بوابة {gate}")
-        if data["is_closed"]:
-            st.warning(f"🚧 بوابة {gate} مغلقة حالياً")
+        if data["level"] == "عالي" and gate not in st.session_state.closed_gates:
+            st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!")
 
-    # تحليل خارجي (اختياري)
-    st.subheader("📷 تحليل صورة للشوارع أو المواقف")
-    uploaded = st.file_uploader("ارفع صورة خارجية", type=["jpg", "png"])
-    if uploaded:
-        img = np.array(Image.open(uploaded))
-        results = model(img)[0]
-        people = sum(1 for c in results.boxes.cls if int(c) == 0)
-        cars = sum(1 for c in results.boxes.cls if int(c) in [2, 3, 5, 7])
-        total = people + cars
-        level, _ = get_congestion_level(total)
-        st.success(f"👥 أشخاص: {people} | 🚗 مركبات: {cars}")
-        st.info(f"🚦 الزحام الإجمالي: ازدحام {level}")
+    # تحليل الصور
+    st.subheader("📸 تحليل الزحام في الشوارع")
+    street_img = st.file_uploader("ارفع صورة", type=["jpg", "png"])
+    if street_img:
+        img_array = np.array(Image.open(street_img))
+        results = model(img_array)[0]
+        person_count = sum(1 for c in results.boxes.cls if int(c) == 0)
+        vehicle_count = sum(1 for c in results.boxes.cls if int(c) in [2, 3, 5, 7])
+        total = person_count + vehicle_count
+        level, _ = (
+            ("خفيف", "#A8E6CF") if total <= 10 else
+            ("متوسط", "#FFD3B6") if total <= 30 else
+            ("عالي", "#FF8B94")
+        )
+        st.success(f"👥 أشخاص: {person_count} | 🚗 مركبات: {vehicle_count}")
+        st.info(f"🚦 مستوى الزحام الإجمالي: ازدحام {level}")
