@@ -10,12 +10,21 @@ from PIL import Image
 # إعداد الصفحة
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
-# تنسيق بصري داكن
+# تنسيق داكن + ألوان زر Movie Style
 st.markdown("""
     <style>
     body { background-color: #1c1c1c; color: white; }
     h1, h2, h3, h4 { color: #ECECEC; font-weight: bold; }
-    .stButton>button { color: white; border-radius: 8px; font-weight: bold; }
+    .stButton>button {
+        background-color: #A8E6CF;
+        color: black;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+    .stButton>button:hover {
+        background-color: #ffcc80;
+        color: black;
+    }
     .stTextInput>div>div>input {
         background-color: #2c2c2c;
         color: white;
@@ -24,7 +33,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# تحميل نموذج YOLO
+# صورة ترحيبية
+st.image("https://drive.google.com/uc?id=1KFlOh1zlb7U3MU50O1dD0-eHRHQhFlkV", use_column_width=True)
+
+# تحميل النموذج
 model_path = "best_Model.pt"
 model_url = "https://drive.google.com/uc?id=1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
 if not os.path.exists(model_path):
@@ -43,6 +55,7 @@ gate_dirs = {
     "G": {"path": "crowd_system/G/g.png", "lat": 21.6242, "lon": 39.1122, "zone": "غرب"},
 }
 
+# تحليل صور البوابات
 gate_info = {}
 for gate, info in gate_dirs.items():
     if os.path.exists(info["path"]):
@@ -57,11 +70,13 @@ for gate, info in gate_dirs.items():
             "zone": info["zone"]
         }
 
-# تحديد نوع المستخدم
-user_type = st.sidebar.radio("أنا:", ["مشجع", "منظم"])
+# متغير البوابات المغلقة
 closed_gates = st.session_state.get("closed_gates", [])
 
-# ------------------- صفحة المشجع -------------------
+# نوع المستخدم
+user_type = st.sidebar.radio("أنا:", ["مشجع", "منظم"])
+
+# ------------------- واجهة المشجع -------------------
 if user_type == "مشجع":
     st.title("🎫 توصية البوابة للمشجع")
     st.subheader("أدخل بيانات تذكرتك")
@@ -100,7 +115,7 @@ if user_type == "مشجع":
         ).add_to(m)
     st_folium(m, width=700, height=450)
 
-# ------------------- صفحة المنظم -------------------
+# ------------------- واجهة المنظم -------------------
 elif user_type == "منظم":
     st.title("📊 لوحة تحكم المنظم")
     st.subheader("🚪 حالة وتحكم البوابات")
@@ -108,12 +123,10 @@ elif user_type == "منظم":
     cols = st.columns(3)
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
-            st.markdown(f"""
-                ### بوابة {gate}
-                - 👥 عدد الأشخاص: `{data['count']}`
-                - 🚦 مستوى الزحام: `ازدحام {data['level']}`
-                - 📌 الحالة: `{"مغلقة" if gate in closed_gates else "مفتوحة"}`
-            """)
+            st.markdown(f"""### بوابة {gate}
+- 👥 عدد الأشخاص: `{data['count']}`
+- 🚦 مستوى الزحام: `ازدحام {data['level']}`
+- 📌 الحالة: `{'مغلقة' if gate in closed_gates else 'مفتوحة'}`""")
 
             if gate in closed_gates:
                 if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
@@ -129,4 +142,14 @@ elif user_type == "منظم":
         if data["level"] == "عالي" and gate not in closed_gates:
             st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!")
 
- 
+    st.subheader("🛣️ تحليل زحام الشوارع والمواقف")
+    street_img = st.file_uploader("📷 حمّل صورة للشارع أو المواقف", type=["jpg", "png"])
+    if street_img:
+        img_array = np.array(Image.open(street_img))
+        results = model(img_array)[0]
+        person_count = sum(1 for c in results.boxes.cls if int(c) == 0)
+        vehicle_count = sum(1 for c in results.boxes.cls if int(c) in [2, 3, 5, 7])
+        total = person_count + vehicle_count
+        level = "خفيف" if total <= 10 else "متوسط" if total <= 30 else "عالي"
+        st.success(f"👥 أشخاص: {person_count} | 🚗 مركبات: {vehicle_count}")
+        st.info(f"🚦 مستوى الزحام الإجمالي: ازدحام {level}")
