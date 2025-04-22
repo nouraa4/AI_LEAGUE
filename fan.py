@@ -45,7 +45,7 @@ for gate, info in gate_dirs.items():
             "zone": info["zone"]
         }
 
-# صفحة الترحيب
+# Welcome Page
 if st.session_state.page == "welcome":
     st.markdown("""
         <style>
@@ -118,8 +118,12 @@ if st.session_state.page == "welcome":
 
     st.markdown("</div></div>", unsafe_allow_html=True)
 
-# صفحة المشجع
+# Fan Page
 elif st.session_state.page == "fan":
+    if st.button("↩️ العودة للصفحة الرئيسية"):
+        st.session_state.page = "welcome"
+        st.experimental_rerun()
+
     st.title("🎫 توصية البوابة للمشجع")
     ticket = st.text_input("أدخل رقم تذكرتك (مثال: C123)")
     if ticket:
@@ -154,18 +158,21 @@ elif st.session_state.page == "fan":
         ).add_to(m)
     st_folium(m, width=700, height=450)
 
-# صفحة المنظم
+# Admin Page
 elif st.session_state.page == "admin":
+    if st.button("↩️ العودة للصفحة الرئيسية"):
+        st.session_state.page = "welcome"
+        st.experimental_rerun()
+
     st.title("📊 لوحة تحكم المنظم")
     st.subheader("🚪 حالة البوابات + التحكم")
 
     cols = st.columns(3)
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
-            st.info(f"""### بوابة {gate}
-👥 عدد الأشخاص: {data['count']}
-🚦 الازدحام: {data['level']}
-🔒 الحالة: {"مغلقة" if gate in st.session_state.closed_gates else "مفتوحة"}""")
+            st.info("### بوابة {}\nعدد الأشخاص: {}\nمستوى الازدحام: {}\nالحالة: {}".format(
+                gate, data['count'], data['level'],
+                "مغلقة" if gate in st.session_state.closed_gates else "مفتوحة"))
 
             if gate in st.session_state.closed_gates:
                 if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
