@@ -46,6 +46,13 @@ for gate, info in gate_dirs.items():
         }
 
 # Welcome Page
+if "page" not in st.session_state:
+    st.session_state.page = "welcome"
+if "closed_gates" not in st.session_state:
+    st.session_state.closed_gates = []
+if "logged_users" not in st.session_state:
+    st.session_state.logged_users = []
+
 if st.session_state.page == "welcome":
     st.markdown("""
         <style>
