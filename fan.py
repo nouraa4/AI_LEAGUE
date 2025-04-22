@@ -119,12 +119,11 @@ if st.session_state.page == "welcome":
             font-size: 3rem;
             font-weight: bold;
             color: white;
-            margin-bottom: 3rem;
+            margin-bottom: 1rem;
         }
 
         .button-row {
             display: flex;
-            gap: 2rem;
         }
 
         .stButton > button {
