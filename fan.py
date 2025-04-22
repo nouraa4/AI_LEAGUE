@@ -88,8 +88,58 @@ if "logged_users" not in st.session_state:
 
 # صفحة الترحيب
 if st.session_state.page == "welcome":
-    st.image("welcome.png", use_column_width=True)
-    st.markdown("<h1 class='hero'>أهلاً بك في منصة الملاعب الذكية F.A.N.S</h1>", unsafe_allow_html=True)
+    st.markdown("""
+        <style>
+        .bg-container {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('https://cdn.pixabay.com/photo/2017/08/06/00/24/stadium-2586128_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -2;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7); /* شفافية داكنة */
+            z-index: -1;
+        }
+
+        .centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FFFFFF;
+            margin-bottom: 2rem;
+        }
+
+        .stButton > button {
+            background-color: #00C896;
+            color: white;
+            padding: 0.8rem 2rem;
+            margin: 0.5rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        </style>
+
+        <div class="bg-container"></div>
+        <div class="overlay"></div>
+        <div class="centered">
+            <div class="welcome-title">🏟️ F.A.N.S - الملعب الذكي للمشجعين</div>
+        """, unsafe_allow_html=True)
+
     col1, col2 = st.columns(2)
     with col1:
         if st.button("أنا مشجع"):
@@ -98,6 +148,8 @@ if st.session_state.page == "welcome":
         if st.button("أنا منظم"):
             st.session_state.page = "admin"
 
+    st.markdown("</div>", unsafe_allow_html=True)
+    
 # صفحة المشجع
 elif st.session_state.page == "fan":
     st.title("🏟️ دخول المشجع")
