@@ -9,13 +9,13 @@ from PIL import Image
 
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
-# session state setup
+# Session State
 if "page" not in st.session_state:
     st.session_state.page = "welcome"
 if "closed_gates" not in st.session_state:
     st.session_state.closed_gates = []
 
-# تحميل نموذج YOLO
+# YOLO تحميل النموذج
 model_path = "best_Model.pt"
 model_url = "https://drive.google.com/uc?id=1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
 if not os.path.exists(model_path):
@@ -34,7 +34,7 @@ gate_dirs = {
     "G": {"path": "crowd_system/G/g.png", "lat": 21.6242, "lon": 39.1122, "zone": "غرب"},
 }
 
-# تحليل صور البوابات
+# تحليل الصور
 gate_info = {}
 for gate, info in gate_dirs.items():
     if os.path.exists(info["path"]):
@@ -49,67 +49,59 @@ for gate, info in gate_dirs.items():
             "zone": info["zone"]
         }
 
-# صفحة الترحيب
+# ---------- WELCOME PAGE ----------
 if st.session_state.page == "welcome":
     st.markdown(f"""
         <style>
-        .bg-container {{
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url("welcome.png");
+        .welcome-container {{
+            background: url("welcome.png");
             background-size: cover;
             background-position: center;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
             z-index: -2;
         }}
         .overlay {{
+            background-color: rgba(0,0,0,0.7);
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.75);
             z-index: -1;
         }}
-        .content {{
+        .center-box {{
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             text-align: center;
         }}
-        .welcome-title {{
+        .title {{
             font-size: 3rem;
             font-weight: bold;
             color: white;
-            margin-bottom: 3rem;
+            margin-bottom: 40px;
         }}
-        .button-row {{
-            display: flex;
-            flex-direction: row;
-            gap: 2rem;
-        }}
-        .stButton > button {{
+        .stButton>button {{
             background-color: transparent;
             color: white;
             border: 2px solid white;
-            padding: 0.8rem 2rem;
-            font-size: 1.2rem;
-            border-radius: 10px;
             font-weight: bold;
-            transition: 0.3s;
+            border-radius: 10px;
+            padding: 0.7rem 2rem;
+            margin: 0 1rem;
         }}
-        .stButton > button:hover {{
+        .stButton>button:hover {{
             background-color: white;
             color: black;
         }}
         </style>
-
-        <div class="bg-container"></div>
+        <div class="welcome-container"></div>
         <div class="overlay"></div>
-        <div class="content">
-            <div class="welcome-title">🏟️ F.A.N.S - الملعب الذكي للمشجعين</div>
-            <div class="button-row">
+        <div class="center-box">
+            <div class="title">🏟️ F.A.N.S - الملعب الذكي للمشجعين</div>
     """, unsafe_allow_html=True)
 
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns(2)
     with col1:
         if st.button("أنا مشجع"):
             st.session_state.page = "fan"
@@ -117,9 +109,9 @@ if st.session_state.page == "welcome":
         if st.button("أنا منظم"):
             st.session_state.page = "admin"
 
-    st.markdown("</div></div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# صفحة المشجع
+# ---------- FAN PAGE ----------
 elif st.session_state.page == "fan":
     st.title("🎫 توصية البوابة للمشجع")
     ticket = st.text_input("أدخل رقم تذكرتك (مثال: C123)")
@@ -155,29 +147,28 @@ elif st.session_state.page == "fan":
         ).add_to(m)
     st_folium(m, width=700, height=450)
 
-# صفحة المنظم
+# ---------- ORGANIZER PAGE ----------
 elif st.session_state.page == "admin":
     st.title("📊 لوحة تحكم المنظم")
-    st.subheader("🚪 إدارة البوابات")
-    for gate in gate_info.keys():
-        if st.checkbox(f"إغلاق بوابة {gate}", value=gate in st.session_state.closed_gates):
-            if gate not in st.session_state.closed_gates:
-                st.session_state.closed_gates.append(gate)
-        else:
-            if gate in st.session_state.closed_gates:
-                st.session_state.closed_gates.remove(gate)
+    st.subheader("🚪 حالة البوابات + التحكم")
 
-    st.subheader("👁️‍🗨️ حالة البوابات")
     cols = st.columns(3)
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
-            st.info(f"""### بوابة {gate}
+            st.info(f"""
+### بوابة {gate}
 👥 عدد الأشخاص: {data['count']}
 🚦 الازدحام: {data['level']}
 🔒 الحالة: {"مغلقة" if gate in st.session_state.closed_gates else "مفتوحة"}
 """)
+            if gate in st.session_state.closed_gates:
+                if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
+                    st.session_state.closed_gates.remove(gate)
+            else:
+                if st.button(f"🔒 إغلاق بوابة {gate}", key=f"close_{gate}"):
+                    st.session_state.closed_gates.append(gate)
 
-    st.subheader("🚨 تنبيهات")
+    st.subheader("🚨 تنبيهات الازدحام")
     for gate, data in gate_info.items():
         if data["level"] == "عالي" and gate not in st.session_state.closed_gates:
             st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!")
