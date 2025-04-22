@@ -95,19 +95,57 @@ for gate, info in gate_dirs.items():
 
 # الصفحة الترحيبية
 if st.session_state.page == "welcome":
-    set_background("welcome.png")
-    st.markdown(f'<div class="welcome-wrapper">', unsafe_allow_html=True)
-    st.markdown(f'<div class="welcome-title">F.A.N.S - الملعب الذكي للمشجعين ⚽</div>', unsafe_allow_html=True)
-    col1, col2 = st.columns([1, 1])
+    st.markdown(f"""
+        <style>
+        .welcome-title {{
+            font-size: 3.5em;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            margin-top: 150px;
+            text-shadow: 2px 2px 5px #000000;
+        }}
+        .button-container {{
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 60px;
+        }}
+        .stApp {{
+            background: url("https://drive.google.com/uc?id=1KFlOh1zlb7U3MU50O1dD0-eHRHQhFlkV") no-repeat center center fixed;
+            background-size: cover;
+        }}
+        .stButton>button {{
+            background-color: #A8E6CF;
+            color: black;
+            border-radius: 12px;
+            font-size: 18px;
+            padding: 0.7em 2em;
+            font-weight: bold;
+            transition: 0.3s ease;
+            border: none;
+        }}
+        .stButton>button:hover {{
+            background-color: white;
+            color: black;
+            transform: scale(1.05);
+        }}
+        </style>
+
+        <div class="welcome-title">⚽ F.A.N.S - الملعب الذكي للمشجعين</div>
+        <div class="button-container">
+    """, unsafe_allow_html=True)
+
+    col1, col2 = st.columns(2)
     with col1:
-        if st.button("أنا مشجع"):
+        if st.button("🎟️ أنا مشجع"):
             st.session_state.page = "fan"
             st.experimental_rerun()
     with col2:
-        if st.button("أنا منظم"):
+        if st.button("🛠️ أنا منظم"):
             st.session_state.page = "admin"
             st.experimental_rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
+
 
 # ------------------- صفحة المشجع -------------------
 elif st.session_state.page == "fan":
