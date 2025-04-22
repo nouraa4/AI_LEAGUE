@@ -15,7 +15,7 @@ st.markdown("""
     <style>
     body { background-color: #1c1c1c; color: white; }
     h1, h2, h3, h4 { color: #ECECEC; font-weight: bold; }
-    .stButton>button { background-color: #A8E6CF; color: black; border-radius: 8px; font-weight: bold; }
+    .stButton>button { background-color: #7a018c; color: black; border-radius: 8px; font-weight: bold; }
     .stTextInput>div>div>input {
         background-color: #2c2c2c;
         color: white;
@@ -129,14 +129,4 @@ elif user_type == "منظم":
         if data["level"] == "عالي" and gate not in closed_gates:
             st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!")
 
-    st.subheader("🛣️ تحليل زحام الشوارع والمواقف")
-    street_img = st.file_uploader("📷 حمّل صورة للشارع أو المواقف", type=["jpg", "png"])
-    if street_img:
-        img_array = np.array(Image.open(street_img))
-        results = model(img_array)[0]
-        person_count = sum(1 for c in results.boxes.cls if int(c) == 0)
-        vehicle_count = sum(1 for c in results.boxes.cls if int(c) in [2, 3, 5, 7])
-        total = person_count + vehicle_count
-        level = "خفيف" if total <= 10 else "متوسط" if total <= 30 else "عالي"
-        st.success(f"👥 أشخاص: {person_count} | 🚗 مركبات: {vehicle_count}")
-        st.info(f"🚦 مستوى الزحام الإجمالي: ازدحام {level}")
+ 
