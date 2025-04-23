@@ -33,7 +33,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # صورة ترحيبية
-st.image("welcome.png", use_column_width=True, output_format="auto", caption="F.A.N.S - ملعب ذكي لمشجع ذكي")
+st.image("welcome.png", use_container_width=True, caption="F.A.N.S - ملعب ذكي لمشجع ذكي")
 
 # تحميل نموذج YOLO
 model_path = "best_Model.pt"
@@ -79,16 +79,14 @@ user_type = st.sidebar.radio("أنا:", ["مشجع", "منظم"])
 if user_type == "مشجع":
     st.title("🏟️ F.A.N.S - الملعب الذكي للمشجعين")
 
-        st.subheader("👤 معلومات المستخدم")
-
+    st.subheader(" معلومات المستخدم")
     with st.form("user_info_form"):
         name = st.text_input("الاسم الكامل")
-        ticket = st.text_input("🎟️ رقم التذكرة (مثال: A123)", key="ticket_input")
+        ticket = st.text_input("🎟️ رقم التذكرة (مثال: A123)")
         confirm = st.form_submit_button("✅ تأكيد الدخول")
-
         if confirm and ticket:
             st.success(f"تم تأكيد دخولك{'، ' + name if name else ''} بتذكرتك رقم {ticket}")
-            
+
     if ticket:
         zone = gate_dirs.get(ticket[0].upper(), {}).get("zone")
         if zone:
