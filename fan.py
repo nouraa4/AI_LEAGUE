@@ -12,11 +12,14 @@ from PIL import Image
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
 # تنسيقات CSS مع صورة بانر
-# تنسيقات CSS مع عنوان فوق الصورةimage_base64 = get_base64_image("welcome.png")
+
+import streamlit as st
+import base64
+
 def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode()
-        
+
 image_base64 = get_base64_image("welcome.png")
 
 st.markdown(f"""
