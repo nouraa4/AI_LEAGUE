@@ -98,7 +98,7 @@ user_type = st.sidebar.radio("أنا:", ["مشجع", "منظم"])
 
 # ------------------- صفحة المشجع -------------------
 if user_type == "مشجع":
-    st.title("🏟️ F.A.N.S - منصة المشجع الذكي")
+    st.title("توصية حسب تذكرتك 🎫") 
 
     st.subheader("معلومات المستخدم")
     with st.form("user_info_form"):
@@ -143,23 +143,28 @@ if user_type == "مشجع":
 
 # ------------------- صفحة المنظم -------------------
 elif user_type == "منظم":
-    st.title("📊 لوحة تحكم المنظم")
-    st.subheader("🕹️ إدارة وتحكم البوابات")
+    st.title("🕹️ لوحة تحكم المنظم")
+    st.subheader(" إدارة وتحكم البوابات")
 
-    cols = st.columns(3)
-    for idx, (gate, data) in enumerate(gate_info.items()):
-        with cols[idx % 3]:
-            st.markdown(f"""### بوابة {gate}
-- 👥 عدد الأشخاص: {data['count']}
-- 🚦 مستوى الزحام: {data['level']}
-- 📌 الحالة: `{'مغلقة' if gate in closed_gates else 'مفتوحة'}`""")
+cols = st.columns(3)
+for idx, (gate, data) in enumerate(gate_info.items()):
+    with cols[idx % 3]:
+        st.markdown(f"""
+            <div style='background-color: #f5f5f5; padding: 16px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 0 4px rgba(0,0,0,0.1);'>
+                <h4 style='margin-top: 0;'>بوابة {gate}</h4>
+                <p>👥 عدد الأشخاص: <strong>{data['count']}</strong></p>
+                <p>🚦 مستوى الزحام: <strong>{data['level']}</strong></p>
+                <p>📌 الحالة: <code>{'مغلقة' if gate in closed_gates else 'مفتوحة'}</code></p>
+        """, unsafe_allow_html=True)
 
-            if gate in closed_gates:
-                if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
-                    closed_gates.remove(gate)
-            else:
-                if st.button(f"🔒 إغلاق بوابة {gate}", key=f"close_{gate}"):
-                    closed_gates.append(gate)
+        if gate in closed_gates:
+            if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
+                closed_gates.remove(gate)
+        else:
+            if st.button(f"🔒 إغلاق بوابة {gate}", key=f"close_{gate}"):
+                closed_gates.append(gate)
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     st.session_state.closed_gates = closed_gates
 
