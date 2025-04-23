@@ -8,56 +8,19 @@ from ultralytics import YOLO
 from streamlit_folium import st_folium
 from PIL import Image
 
+
 # إعداد الصفحة
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
-# تنسيقات CSS مع صورة بانر
+# عرض صورة كـ بانر
+banner = Image.open("welcome.png")
+st.image(banner, use_column_width=True)
 
-
-# لتحويل الصورة إلى base64
-def get_base64_image(image_path):
-    with open(image_path, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode()
-
-# قراءة الصورة
-image_base64 = get_base64_image("welcome.png")
-
-# كود البانر المعدل مع تهريب الأقواس
-st.markdown(f"""
-    <style>
-    .banner-container {{
-        position: relative;
-        width: 100%;
-        height: 260px;
-        overflow: hidden;
-        border-radius: 12px;
-        margin-bottom: 30px;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    }}
-    .banner-container img {{
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        filter: brightness(0.5);
-    }}
-    .banner-text {{
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 2.8rem;
-        font-weight: bold;
-        text-align: center;
-        text-shadow: 2px 2px 8px #000000;
-    }}
-    </style>
-    <div class="banner-container">
-        <img src="data:image/png;base64,{image_base64}">
-        <div class="banner-text">F.A.N.S - الملعب الذكي للمشجعين</div>
-    </div>
-""", unsafe_allow_html=True)
-
+# نص فوق الصورة
+st.markdown(
+    "<h1 style='text-align: center; color: white; margin-top: -200px; text-shadow: 2px 2px 8px black;'>F.A.N.S - الملعب الذكي للمشجعين</h1>",
+    unsafe_allow_html=True
+)
 
 # تحميل نموذج YOLO
 model_path = "best_Model.pt"
