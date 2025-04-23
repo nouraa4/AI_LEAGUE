@@ -85,7 +85,7 @@ Watch our project demo here:
 **[FanIQ Demo Video - Google Drive](https://drive.google.com/file/d/1URNQ-5kOLMAH3fPv2eBFKq-BVOuZnXga)**
 
 Try it live:  
-**[FanIQ Streamlit Web App](https://ailuguge-pyyfczzgbn8yezazup2axq.streamlit.app)**
+**[FanIQ Streamlit Web App](https://aileague-fnsnd4ht8zzz6uhec6x7gp.streamlit.app/)**
 
 ---
 
