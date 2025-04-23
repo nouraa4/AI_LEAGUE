@@ -16,10 +16,10 @@ def get_base64_image(image_path):
         return base64.b64encode(img_file.read()).decode()
 
 # تحميل صورة البانر
+image_html = ""
 if os.path.exists("welcome.png"):
     image_base64 = get_base64_image("welcome.png")
-
-    st.markdown(f"""
+    image_html = f"""
         <style>
         .banner-container {{
             position: relative;
@@ -52,9 +52,8 @@ if os.path.exists("welcome.png"):
             <img src="data:image/png;base64,{image_base64}">
             <div class="banner-text">F.A.N.S - الملعب الذكي للمشجعين</div>
         </div>
-    """, unsafe_allow_html=True)
-else:
-    st.warning("⚠️ الصورة 'welcome.png' غير موجودة!")
+    """
+st.markdown(image_html, unsafe_allow_html=True)
 
 # تحميل نموذج YOLO
 model_path = "best_Model.pt"
@@ -98,7 +97,7 @@ user_type = st.sidebar.radio("أنا:", ["مشجع", "منظم"])
 
 # ------------------- صفحة المشجع -------------------
 if user_type == "مشجع":
-    st.title("توصية حسب تذكرتك 🎫") 
+    st.title("توصية حسب تذكرتك 🎫")
 
     st.subheader("معلومات المستخدم")
     with st.form("user_info_form"):
@@ -144,31 +143,37 @@ if user_type == "مشجع":
 # ------------------- صفحة المنظم -------------------
 elif user_type == "منظم":
     st.title("🕹️ لوحة تحكم المنظم")
-    st.subheader(" إدارة وتحكم البوابات")
+    st.subheader("إدارة وتحكم البوابات")
 
-cols = st.columns(3)
-for idx, (gate, data) in enumerate(gate_info.items()):
-    with cols[idx % 3]:
-        st.markdown(f"""
-            <div style='background-color: #f5f5f5; padding: 16px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 0 4px rgba(0,0,0,0.1);'>
-                <h4 style='margin-top: 0;'>بوابة {gate}</h4>
-                <p>👥 عدد الأشخاص: <strong>{data['count']}</strong></p>
-                <p>🚦 مستوى الزحام: <strong>{data['level']}</strong></p>
-                <p>📌 الحالة: <code>{'مغلقة' if gate in closed_gates else 'مفتوحة'}</code></p>
-        """, unsafe_allow_html=True)
+    cols = st.columns(3)
+    for idx, (gate, data) in enumerate(gate_info.items()):
+        with cols[idx % 3]:
+            st.markdown(f"""
+                <div style='background-color: #2c2c2e; padding: 16px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 0 6px rgba(0,0,0,0.3); color: white;'>
+                    <h4 style='margin-top: 0;'>بوابة {gate}</h4>
+                    <p>👥 عدد الأشخاص: <strong>{data['count']}</strong></p>
+                    <p>🚦 مستوى الزحام: <strong>{data['level']}</strong></p>
+                    <p>📌 الحالة: <code style='color:{"red" if gate in closed_gates else "lightgreen"};'>{'مغلقة' if gate in closed_gates else 'مفتوحة'}</code></p>
+            """, unsafe_allow_html=True)
 
-        if gate in closed_gates:
-            if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
-                closed_gates.remove(gate)
-        else:
-            if st.button(f"🔒 إغلاق بوابة {gate}", key=f"close_{gate}"):
-                closed_gates.append(gate)
+            if gate in closed_gates:
+                if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
+                    closed_gates.remove(gate)
+            else:
+                if st.button(f"🔒 إغلاق بوابة {gate}", key=f"close_{gate}"):
+                    closed_gates.append(gate)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
 
     st.session_state.closed_gates = closed_gates
 
-    st.subheader("🚨 تنبيهات الازدحام")
-    for gate, data in gate_info.items():
-        if data["level"] == "عالي" and gate not in closed_gates:
-            st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!")
+    alerts = [
+        f"⚠️ ازدحام عالي عند بوابة {gate}!"
+        for gate, data in gate_info.items()
+        if data["level"] == "عالي" and gate not in closed_gates
+    ]
+
+    if alerts:
+        st.subheader("🚨 تنبيهات الازدحام")
+        for alert in alerts:
+            st.error(alert)
