@@ -11,10 +11,11 @@ from PIL import Image
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
 # تنسيقات CSS مع صورة بانر
-# تنسيقات CSS مع عنوان فوق الصورة
-st.markdown("""
+# تنسيقات CSS مع عنوان فوق الصورةimage_base64 = get_base64_image("welcome.png")
+
+st.markdown(f"""
     <style>
-    .banner-container {
+    .banner-container {{
         position: relative;
         width: 100%;
         height: 260px;
@@ -22,14 +23,14 @@ st.markdown("""
         border-radius: 12px;
         margin-bottom: 30px;
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    }
-    .banner-container img {
+    }}
+    .banner-container img {{
         width: 100%;
         height: 100%;
         object-fit: cover;
         filter: brightness(0.5);
-    }
-    .banner-text {
+    }}
+    .banner-text {{
         position: absolute;
         top: 50%;
         left: 50%;
@@ -39,13 +40,14 @@ st.markdown("""
         font-weight: bold;
         text-align: center;
         text-shadow: 2px 2px 8px #000000;
-    }
+    }}
     </style>
     <div class="banner-container">
-        <img src="welcome.png">
+        <img src="data:image/png;base64,{image_base64}">
         <div class="banner-text">F.A.N.S - الملعب الذكي للمشجعين</div>
     </div>
 """, unsafe_allow_html=True)
+
 
 # تحميل نموذج YOLO
 model_path = "best_Model.pt"
