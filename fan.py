@@ -7,21 +7,21 @@ from ultralytics import YOLO
 from streamlit_folium import st_folium
 from PIL import Image
 
-# إعداد الصفحة
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
-# تنسيق داكن + ألوان زر Movie Style
+# تنسيق ستايل
 st.markdown("""
     <style>
     body { background-color: #1c1c1c; color: white; }
     h1, h2, h3, h4 { color: #ECECEC; font-weight: bold; }
     .stButton>button {
-        color: white;
+        background-color: #A8E6CF;
+        color: black;
         border-radius: 8px;
         font-weight: bold;
     }
     .stButton>button:hover {
-        background-color: #ffcc80;
+        background-color: #DDA0DD; /* mauve */
         color: black;
     }
     .stTextInput>div>div>input {
@@ -32,7 +32,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# تحميل النموذج
+# تحميل نموذج YOLO
 model_path = "best_Model.pt"
 model_url = "https://drive.google.com/uc?id=1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
 if not os.path.exists(model_path):
@@ -51,7 +51,7 @@ gate_dirs = {
     "G": {"path": "crowd_system/G/g.png", "lat": 21.6242, "lon": 39.1122, "zone": "غرب"},
 }
 
-# تحليل صور البوابات
+# تحليل الصور
 gate_info = {}
 for gate, info in gate_dirs.items():
     if os.path.exists(info["path"]):
@@ -66,7 +66,7 @@ for gate, info in gate_dirs.items():
             "zone": info["zone"]
         }
 
-# متغير البوابات المغلقة
+# إغلاق البوابات يدويًا من المنظم
 closed_gates = st.session_state.get("closed_gates", [])
 
 # نوع المستخدم
@@ -74,35 +74,38 @@ user_type = st.sidebar.radio("أنا:", ["مشجع", "منظم"])
 
 # ------------------- واجهة المشجع -------------------
 if user_type == "مشجع":
-    st.title("🎫 توصية البوابة للمشجع")
-    st.subheader("أدخل بيانات تذكرتك")
-    ticket = st.text_input("🎟️ رقم التذكرة (مثال: A123)")
+    st.title("🎫 بيانات المشجع")
+    with st.form("fan_form"):
+        name = st.text_input("👤 الاسم الكامل")
+        ticket = st.text_input("🎟️ رقم التذكرة (مثال: B123)")
+        submitted = st.form_submit_button("تأكيد الدخول")
 
-    if ticket:
+    if submitted and ticket:
         zone = gate_dirs.get(ticket[0].upper(), {}).get("zone")
         if zone:
+            st.success(f"✅ تم تسجيل دخولك بنجاح يا {name}!")
             st.info(f"📍 جهة مقعدك: {zone}")
-            available = {
+            zone_gates = {
                 g: d for g, d in gate_info.items()
                 if d["zone"] == zone and g not in closed_gates
             }
-            filtered = {g: d for g, d in available.items() if d["level"] != "عالي"}
-
-            if filtered:
-                best_gate = min(filtered.items(), key=lambda x: x[1]["count"])[0]
-                level = filtered[best_gate]["level"]
-                st.success(f"✅ نوصي بالتوجه إلى بوابة: {best_gate} (ازدحام {level})")
+            # البحث عن بوابة خفيفة أو متوسطة
+            recommended = {g: d for g, d in zone_gates.items() if d["level"] != "عالي"}
+            if recommended:
+                best_gate = min(recommended.items(), key=lambda x: x[1]["count"])[0]
+                st.success(f"🎯 تم تخصيص بوابة: {best_gate} ({recommended[best_gate]['level']})")
+                if gate_info[best_gate]["level"] == "عالي":
+                    st.warning(f"⚠️ تنبيه: ازدحام مرتفع في بوابتك {best_gate}. سيتم إشعارك عند توفر بوابة بديلة.")
             else:
-                st.warning("⚠️ لا توجد بوابات متاحة حاليًا في هذه الجهة أو جميعها مغلقة/مزدحمة.")
+                st.warning("⚠️ لا توجد بوابات خفيفة متاحة حالياً في هذه الجهة.")
         else:
-            st.error("❌ رقم التذكرة غير معروف")
+            st.error("❌ رقم التذكرة غير معروف أو غير مدعوم.")
 
     st.subheader("🗺️ خريطة البوابات")
     m = folium.Map(location=[21.6235, 39.1115], zoom_start=17)
     for gate, data in gate_info.items():
         folium.Marker(
-            location=[data["lat"], data["lon"]],
-            popup=f"بوابة {gate} - ازدحام {data['level']}" + (" (مغلقة)" if gate in closed_gates else ""),
+            location=[data["lat"], data["lon"]],popup=f"بوابة {gate} - ازدحام {data['level']}" + (" (مغلقة)" if gate in closed_gates else ""),
             icon=folium.Icon(
                 color="gray" if gate in closed_gates else
                 "green" if data["level"] == "خفيف" else
@@ -114,32 +117,29 @@ if user_type == "مشجع":
 # ------------------- واجهة المنظم -------------------
 elif user_type == "منظم":
     st.title("📊 لوحة تحكم المنظم")
-    st.subheader("🚪 حالة وتحكم البوابات")
 
     cols = st.columns(3)
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
             st.markdown(f"""### بوابة {gate}
-- 👥 عدد الأشخاص: `{data['count']}`
-- 🚦 مستوى الزحام: `ازدحام {data['level']}`
-- 📌 الحالة: `{'مغلقة' if gate in closed_gates else 'مفتوحة'}`""")
-
+- 👥 الأشخاص: {data['count']}
+- 🚦 الزحام: ازدحام {data['level']}
+- 🔐 الحالة: `{'مغلقة' if gate in closed_gates else 'مفتوحة'}`""")
             if gate in closed_gates:
                 if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
                     closed_gates.remove(gate)
             else:
                 if st.button(f"🔒 إغلاق بوابة {gate}", key=f"close_{gate}"):
                     closed_gates.append(gate)
-
     st.session_state.closed_gates = closed_gates
 
-    st.subheader("🚨 تنبيهات الازدحام")
+    st.subheader("🚨 تنبيهات")
     for gate, data in gate_info.items():
         if data["level"] == "عالي" and gate not in closed_gates:
-            st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!")
+            st.error(f"⚠️ ازدحام مرتفع عند بوابة {gate}")
 
-    st.subheader("🛣️ تحليل زحام الشوارع والمواقف")
-    street_img = st.file_uploader("📷 حمّل صورة للشارع أو المواقف", type=["jpg", "png"])
+    st.subheader("🛣️ تحليل صورة للشوارع/المواقف")
+    street_img = st.file_uploader("📷 حمّل صورة", type=["jpg", "png"])
     if street_img:
         img_array = np.array(Image.open(street_img))
         results = model(img_array)[0]
