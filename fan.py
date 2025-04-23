@@ -3,14 +3,14 @@ import os
 import gdown
 import numpy as np
 import folium
+from PIL import Image
 from ultralytics import YOLO
 from streamlit_folium import st_folium
-from PIL import Image
 
 # إعداد الصفحة
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
-# تنسيقات CSS
+# تنسيق CSS
 st.markdown("""
     <style>
     body { background-color: #1c1c1c; color: white; }
@@ -22,7 +22,6 @@ st.markdown("""
         font-weight: bold;
     }
     .stButton>button:hover {
-        background-color: #9C27B0;
         color: white;
     }
     .stTextInput>div>div>input {
@@ -32,9 +31,6 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
-# صورة ترحيبية
-st.image("https://drive.google.com/uc?id=1KFlOh1zlb7U3MU50O1dD0-eHRHQhFlkV", use_column_width=True, output_format="auto", caption="F.A.N.S - ملعب ذكي لمشجع ذكي")
 
 # تحميل نموذج YOLO
 model_path = "best_Model.pt"
@@ -55,13 +51,18 @@ gate_dirs = {
     "G": {"path": "crowd_system/G/g.png", "lat": 21.6242, "lon": 39.1122, "zone": "غرب"},
 }
 
-# حساب الزحام من الصور
+# تحليل الصور وتحديد مستوى الزحام
 gate_info = {}
 for gate, info in gate_dirs.items():
     if os.path.exists(info["path"]):
         results = model(info["path"])[0]
         count = sum(1 for c in results.boxes.cls if int(c) == 0)
-        level = "خفيف" if count <= 10 else "متوسط" if count <= 30 else "عالي"
+        if count <= 10:
+            level = "خفيف"
+        elif count <= 30:
+            level = "متوسط"
+        else:
+            level = "عالي"
         gate_info[gate] = {
             "count": count,
             "level": level,
@@ -70,80 +71,80 @@ for gate, info in gate_dirs.items():
             "zone": info["zone"]
         }
 
-# الحالة الافتراضية
-closed_gates = st.session_state.get("closed_gates", [])
+# بوابات مغلقة (يدويًا من المنظم)
+if "closed_gates" not in st.session_state:
+    st.session_state.closed_gates = []
 
-# نوع المستخدم
+# اختيار نوع المستخدم
 user_type = st.sidebar.radio("أنا:", ["مشجع", "منظم"])
 
-# ------------------- صفحة المشجع -------------------
+# ---------------- صفحة المشجع ----------------
 if user_type == "مشجع":
-    st.title("🏟️ F.A.N.S - الملعب الذكي للمشجعين")
-
-    st.subheader(" معلومات المستخدم")
-    with st.form("user_info_form"):
-        name = st.text_input("الاسم (اختياري)")
-        ticket = st.text_input("🎟️ رقم التذكرة (مثال: A123)")
-        confirm = st.form_submit_button("✅ تأكيد الدخول")
-        if confirm and ticket:
-            st.success(f"تم تأكيد دخولك{'، ' + name if name else ''} بتذكرتك رقم {ticket}")
-
+    st.title("🎫 مشجع - توصية البوابة")
+    
+    name = st.text_input("👤 اسمك")
+    ticket = st.text_input("🎟️ رقم التذكرة (مثال: A123)")
+    
     if ticket:
-        zone = gate_dirs.get(ticket[0].upper(), {}).get("zone")
+        gate_letter = ticket[0].upper()
+        zone = gate_dirs.get(gate_letter, {}).get("zone")
+        
         if zone:
-            st.info(f"📍 جهة مقعدك: {zone}")
+            st.info(f"📍 جهة المقعد (حسب التذكرة): {zone}")
             available = {
                 g: d for g, d in gate_info.items()
-                if d["zone"] == zone and g not in closed_gates
+                if d["zone"] == zone and g not in st.session_state.closed_gates
             }
-            filtered = {g: d for g, d in available.items() if d["level"] != "عالي"}
+            not_heavy = {g: d for g, d in available.items() if d["level"] != "عالي"}
 
-            if filtered:
-                best_gate = min(filtered.items(), key=lambda x: x[1]["count"])[0]
-                level = filtered[best_gate]["level"]
-                st.success(f"✅ نوصي بالتوجه إلى بوابة: {best_gate} (ازدحام {level})")
+            if not_heavy:
+                best_gate = min(not_heavy.items(), key=lambda x: x[1]["count"])[0]
+                level = not_heavy[best_gate]["level"]
+                st.success(f"✅ نوصي بالتوجه إلى بوابة: {best_gate} ( {level} )")
+            elif available:
+                congested_gate = min(available.items(), key=lambda x: x[1]["count"])[0]
+                st.warning(f"⚠️ بوابتك الحالية مزدحمة، أقرب خيار هو {congested_gate}")
             else:
-                st.warning("⚠️ لا توجد بوابات متاحة حاليًا في هذه الجهة أو جميعها مغلقة/مزدحمة.")
+                st.error("❌ لا توجد بوابات متاحة حاليًا في هذه الجهة.")
         else:
-            st.error("❌ رقم التذكرة غير معروف")
+            st.error("❌ رقم تذكرة غير معروف.")
 
     st.subheader("🗺️ خريطة البوابات")
     m = folium.Map(location=[21.6235, 39.1115], zoom_start=17)
     for gate, data in gate_info.items():
         folium.Marker(
             location=[data["lat"], data["lon"]],
-            popup=f"بوابة {gate} - ازدحام {data['level']}" + (" (مغلقة)" if gate in closed_gates else ""),
+            popup=f"بوابة {gate} - {data['level']}" + (" (مغلقة)" if gate in st.session_state.closed_gates else ""),
             icon=folium.Icon(
-                color="gray" if gate in closed_gates else
+                color="gray" if gate in st.session_state.closed_gates else
                 "green" if data["level"] == "خفيف" else
                 "orange" if data["level"] == "متوسط" else "red"
             )
         ).add_to(m)
-    st_folium(m, width=700, height=450)
+    st_folium(m, use_container_width=True)
 
-# ------------------- صفحة المنظم -------------------
-elif user_type == "منظم":
+# ---------------- صفحة المنظم ----------------
+else:
     st.title("📊 لوحة تحكم المنظم")
-    st.subheader(" حالة وتحكم البوابات")
+    st.subheader("🕹️ التحكم في البوابات")
 
     cols = st.columns(3)
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
             st.markdown(f"""### بوابة {gate}
 - 👥 عدد الأشخاص: `{data['count']}`
-- 🚦 مستوى الزحام: `ازدحام {data['level']}`
-- 📌 الحالة: `{'مغلقة' if gate in closed_gates else 'مفتوحة'}`""")
-
-            if gate in closed_gates:
+- 🚦 الزحام: `{data['level']}`
+- 📌 الحالة: `{"مغلقة" if gate in st.session_state.closed_gates else "مفتوحة"}`""")
+            
+            if gate in st.session_state.closed_gates:
                 if st.button(f"🔓 فتح بوابة {gate}", key=f"open_{gate}"):
-                    closed_gates.remove(gate)
+                    st.session_state.closed_gates.remove(gate)
             else:
                 if st.button(f"🔒 إغلاق بوابة {gate}", key=f"close_{gate}"):
-                    closed_gates.append(gate)
+                    st.session_state.closed_gates.append(gate)
 
-    st.session_state.closed_gates = closed_gates
-
-    st.subheader("🚨 تنبيهات الازدحام")
+    st.subheader("🚨 تنبيهات")
     for gate, data in gate_info.items():
-        if data["level"] == "عالي" and gate not in closed_gates:
+        if data["level"] == "عالي" and gate not in st.session_state.closed_gates:
             st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!")
+
