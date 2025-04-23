@@ -10,7 +10,7 @@ from PIL import Image
 # إعداد الصفحة
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
-# تنسيقات CSS
+# تنسيقات CSS مع صورة بانر
 st.markdown("""
     <style>
     body { background-color: #1c1c1c; color: white; }
@@ -22,6 +22,7 @@ st.markdown("""
         font-weight: bold;
     }
     .stButton>button:hover {
+        background-color: #9370DB;
         color: white;
     }
     .stTextInput>div>div>input {
@@ -29,11 +30,37 @@ st.markdown("""
         color: white;
         border-radius: 8px;
     }
+    .banner-container {
+        position: relative;
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+    .banner-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.5);
+    }
+    .banner-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 2.5rem;
+        font-weight: bold;
+        text-shadow: 2px 2px 6px #000;
+    }
     </style>
-""", unsafe_allow_html=True)
 
-# صورة ترحيبية
-st.image("welcome.png", use_container_width=True, caption="F.A.N.S - ملعب ذكي لمشجع ذكي")
+    <div class="banner-container">
+        <img src="welcome.png">
+        <div class="banner-text">F.A.N.S - ملعب ذكي لمشجع ذكي</div>
+    </div>
+""", unsafe_allow_html=True)
 
 # تحميل نموذج YOLO
 model_path = "best_Model.pt"
@@ -54,7 +81,7 @@ gate_dirs = {
     "G": {"path": "crowd_system/G/g.png", "lat": 21.6242, "lon": 39.1122, "zone": "غرب"},
 }
 
-# حساب الزحام من الصور
+# تحليل الزحام
 gate_info = {}
 for gate, info in gate_dirs.items():
     if os.path.exists(info["path"]):
@@ -69,17 +96,17 @@ for gate, info in gate_dirs.items():
             "zone": info["zone"]
         }
 
-# الحالة الافتراضية
+# حالة البوابات المغلقة
 closed_gates = st.session_state.get("closed_gates", [])
 
-# نوع المستخدم
+# تحديد نوع المستخدم
 user_type = st.sidebar.radio("أنا:", ["مشجع", "منظم"])
 
 # ------------------- صفحة المشجع -------------------
 if user_type == "مشجع":
-    st.title("🏟️ F.A.N.S - الملعب الذكي للمشجعين")
+    st.title("🏟️ F.A.N.S - منصة المشجع الذكي")
 
-    st.subheader(" معلومات المستخدم")
+    st.subheader("معلومات المستخدم")
     with st.form("user_info_form"):
         name = st.text_input("الاسم الكامل")
         ticket = st.text_input("🎟️ رقم التذكرة (مثال: A123)")
@@ -100,7 +127,7 @@ if user_type == "مشجع":
             if filtered:
                 best_gate = min(filtered.items(), key=lambda x: x[1]["count"])[0]
                 level = filtered[best_gate]["level"]
-                st.success(f"✅ نوصي بالتوجه إلى بوابة: {best_gate} (ازدحام {level})")
+                st.success(f"✅ نوصي بالتوجه إلى بوابة: {best_gate} ({level})")
             else:
                 st.warning("⚠️ لا توجد بوابات متاحة حاليًا في هذه الجهة أو جميعها مغلقة/مزدحمة.")
         else:
@@ -111,7 +138,7 @@ if user_type == "مشجع":
     for gate, data in gate_info.items():
         folium.Marker(
             location=[data["lat"], data["lon"]],
-            popup=f"بوابة {gate} - ازدحام {data['level']}" + (" (مغلقة)" if gate in closed_gates else ""),
+            popup=f"بوابة {gate} - {data['level']}" + (" (مغلقة)" if gate in closed_gates else ""),
             icon=folium.Icon(
                 color="gray" if gate in closed_gates else
                 "green" if data["level"] == "خفيف" else
