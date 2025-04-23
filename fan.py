@@ -11,32 +11,17 @@ from PIL import Image
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
 # تنسيقات CSS مع صورة بانر
+# تنسيقات CSS مع عنوان فوق الصورة
 st.markdown("""
     <style>
-    body { background-color: #1c1c1c; color: white; }
-    h1, h2, h3, h4 { color: #ECECEC; font-weight: bold; }
-    .stButton>button {
-        background-color: #A8E6CF;
-        color: black;
-        border-radius: 8px;
-        font-weight: bold;
-    }
-    .stButton>button:hover {
-        background-color: #9370DB;
-        color: white;
-    }
-    .stTextInput>div>div>input {
-        background-color: #2c2c2c;
-        color: white;
-        border-radius: 8px;
-    }
     .banner-container {
         position: relative;
         width: 100%;
-        height: 250px;
+        height: 260px;
         overflow: hidden;
         border-radius: 12px;
         margin-bottom: 30px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     }
     .banner-container img {
         width: 100%;
@@ -50,15 +35,15 @@ st.markdown("""
         left: 50%;
         transform: translate(-50%, -50%);
         color: white;
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: bold;
-        text-shadow: 2px 2px 6px #000;
+        text-align: center;
+        text-shadow: 2px 2px 8px #000000;
     }
     </style>
-
     <div class="banner-container">
         <img src="welcome.png">
-        <div class="banner-text">F.A.N.S - ملعب ذكي لمشجع ذكي</div>
+        <div class="banner-text">F.A.N.S - الملعب الذكي للمشجعين</div>
     </div>
 """, unsafe_allow_html=True)
 
