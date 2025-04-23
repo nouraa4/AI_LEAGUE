@@ -5,16 +5,23 @@ import numpy as np
 import folium
 from ultralytics import YOLO
 from streamlit_folium import st_folium
-from PIL import Image
+import base64
 
 # إعداد الصفحة
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
-# عرض صورة بانر باستخدام st.image بدل HTML داخل <img>
+# دالة لتحويل الصورة إلى Base64
+def get_base64_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+# تحميل صورة البانر
 if os.path.exists("welcome.png"):
-    st.markdown("""
+    image_base64 = get_base64_image("welcome.png")
+
+    st.markdown(f"""
         <style>
-        .banner-container {
+        .banner-container {{
             position: relative;
             width: 100%;
             height: 260px;
@@ -22,8 +29,14 @@ if os.path.exists("welcome.png"):
             border-radius: 12px;
             margin-bottom: 30px;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-        .banner-text {
+        }}
+        .banner-container img {{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.5);
+        }}
+        .banner-text {{
             position: absolute;
             top: 50%;
             left: 50%;
@@ -33,15 +46,15 @@ if os.path.exists("welcome.png"):
             font-weight: bold;
             text-align: center;
             text-shadow: 2px 2px 8px #000000;
-        }
+        }}
         </style>
         <div class="banner-container">
+            <img src="data:image/png;base64,{image_base64}">
             <div class="banner-text">F.A.N.S - الملعب الذكي للمشجعين</div>
         </div>
     """, unsafe_allow_html=True)
-    st.image("welcome.png", use_column_width=True)
 else:
-    st.warning("⚠️ الصورة 'welcome.png' غير موجودة في مجلد المشروع.")
+    st.warning("⚠️ الصورة 'welcome.png' غير موجودة!")
 
 # تحميل نموذج YOLO
 model_path = "best_Model.pt"
@@ -114,7 +127,7 @@ if user_type == "مشجع":
         else:
             st.error("❌ رقم التذكرة غير معروف")
 
-    st. subheader("🗺️ خريطة البوابات")
+    st.subheader("🗺️ خريطة البوابات")
     m = folium.Map(location=[21.6235, 39.1115], zoom_start=17)
     for gate, data in gate_info.items():
         folium.Marker(
@@ -153,4 +166,4 @@ elif user_type == "منظم":
     st.subheader("🚨 تنبيهات الازدحام")
     for gate, data in gate_info.items():
         if data["level"] == "عالي" and gate not in closed_gates:
-            st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!") 
+            st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!")
