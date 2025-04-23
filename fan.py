@@ -3,24 +3,45 @@ import os
 import gdown
 import numpy as np
 import folium
-import base64
 from ultralytics import YOLO
 from streamlit_folium import st_folium
 from PIL import Image
 
-
 # إعداد الصفحة
 st.set_page_config(layout="wide", page_title="F.A.N.S", page_icon="⚽")
 
-# عرض صورة كـ بانر
-banner = Image.open("welcome.png")
-st.image(banner, use_column_width=True)
-
-# نص فوق الصورة
-st.markdown(
-    "<h1 style='text-align: center; color: white; margin-top: -200px; text-shadow: 2px 2px 8px black;'>F.A.N.S - الملعب الذكي للمشجعين</h1>",
-    unsafe_allow_html=True
-)
+# عرض صورة بانر باستخدام st.image بدل HTML داخل <img>
+if os.path.exists("welcome.png"):
+    st.markdown("""
+        <style>
+        .banner-container {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        .banner-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 2.8rem;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 2px 2px 8px #000000;
+        }
+        </style>
+        <div class="banner-container">
+            <div class="banner-text">F.A.N.S - الملعب الذكي للمشجعين</div>
+        </div>
+    """, unsafe_allow_html=True)
+    st.image("welcome.png", use_column_width=True)
+else:
+    st.warning("⚠️ الصورة 'welcome.png' غير موجودة في مجلد المشروع.")
 
 # تحميل نموذج YOLO
 model_path = "best_Model.pt"
@@ -93,7 +114,7 @@ if user_type == "مشجع":
         else:
             st.error("❌ رقم التذكرة غير معروف")
 
-    st.subheader("🗺️ خريطة البوابات")
+    st. subheader("🗺️ خريطة البوابات")
     m = folium.Map(location=[21.6235, 39.1115], zoom_start=17)
     for gate, data in gate_info.items():
         folium.Marker(
@@ -116,8 +137,8 @@ elif user_type == "منظم":
     for idx, (gate, data) in enumerate(gate_info.items()):
         with cols[idx % 3]:
             st.markdown(f"""### بوابة {gate}
-- 👥 عدد الأشخاص: `{data['count']}`
-- 🚦 مستوى الزحام: `{data['level']}`
+- 👥 عدد الأشخاص: {data['count']}
+- 🚦 مستوى الزحام: {data['level']}
 - 📌 الحالة: `{'مغلقة' if gate in closed_gates else 'مفتوحة'}`""")
 
             if gate in closed_gates:
@@ -132,5 +153,4 @@ elif user_type == "منظم":
     st.subheader("🚨 تنبيهات الازدحام")
     for gate, data in gate_info.items():
         if data["level"] == "عالي" and gate not in closed_gates:
-            st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!")
-
+            st.error(f"⚠️ ازدحام عالي عند بوابة {gate}!") 
