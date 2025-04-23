@@ -79,14 +79,16 @@ user_type = st.sidebar.radio("أنا:", ["مشجع", "منظم"])
 if user_type == "مشجع":
     st.title("🏟️ F.A.N.S - الملعب الذكي للمشجعين")
 
-    st.subheader(" معلومات المستخدم")
+        st.subheader("👤 معلومات المستخدم")
+
     with st.form("user_info_form"):
-        name = st.text_input("الاسم الكامل)")
-        ticket = st.text_input("🎟️ رقم التذكرة (مثال: A123)")
+        name = st.text_input("الاسم الكامل")
+        ticket = st.text_input("🎟️ رقم التذكرة (مثال: A123)", key="ticket_input")
         confirm = st.form_submit_button("✅ تأكيد الدخول")
+
         if confirm and ticket:
             st.success(f"تم تأكيد دخولك{'، ' + name if name else ''} بتذكرتك رقم {ticket}")
-
+            
     if ticket:
         zone = gate_dirs.get(ticket[0].upper(), {}).get("zone")
         if zone:
