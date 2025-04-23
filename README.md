@@ -82,7 +82,7 @@ FanIQ provides a smart and real-time solution that:
 ## Demo
 
 Watch our project demo here:  
-**[FanIQ Demo Video - Google Drive](https://drive.google.com/file/d/1URNQ-5kOLMAH3fPv2eBFKq-BVOuZnXga)**
+**[FanIQ Demo Video - Google Drive](https://drive.google.com/file/d/1s4sribYDe6vlVqn5emVlPTklsHmDxOWb/view?usp=drivesdk)**
 
 Try it live:  
 **[FanIQ Streamlit Web App](https://aileague-fnsnd4ht8zzz6uhec6x7gp.streamlit.app/)**
