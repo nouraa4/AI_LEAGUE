@@ -58,10 +58,14 @@ st.markdown(image_html, unsafe_allow_html=True)
 # تحميل نموذج YOLO
 model_path = "best_Model.pt"
 model_url = "https://drive.google.com/uc?id=1Lz6H7w92fli_I88Jy2Hd6gacUoPyNVPt"
-if not os.path.exists(model_path):
-    with st.spinner("📥 جاري تحميل نموذج YOLO..."):
-        gdown.download(model_url, model_path, quiet=False)
-model = YOLO(model_path)
+@st.cache_resource
+def load_model():
+    if not os.path.exists(model_path):
+        with st.spinner("📥 جاري تحميل نموذج YOLO..."):
+            gdown.download(model_url, model_path, quiet=False)
+    return YOLO(model_path)
+
+model = load_model()
 
 # بيانات البوابات
 gate_dirs = {
